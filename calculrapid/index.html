@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Quinzet - Sèries de Rapidesa de Càlcul Mental</title>
+    <!-- Tailwind CSS per a una interfície de disseny modern i adaptable -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons per a icones visuals netes -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght=300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+        /* Amagar les fletxes predeterminades dels camps numèrics */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Capçalera Principal estil Quinzet -->
+    <header class="bg-blue-600 text-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <!-- Logotip circular característic de El Quinzet -->
+                <div class="w-16 h-16 bg-blue-800 rounded-full flex items-center justify-center border-4 border-amber-400 shadow-inner shrink-0 relative">
+                    <div class="absolute w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center font-extrabold text-blue-900 text-2xl">Q</div>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black tracking-tight">El Quinzet</h1>
+                    <p class="text-xs text-blue-100 uppercase font-bold tracking-widest">Sèries de rapidesa de càlcul mental</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 bg-blue-700/60 px-4 py-2 rounded-xl text-sm font-medium border border-blue-500/30">
+                <i data-lucide="graduation-cap" class="w-5 h-5 text-amber-300"></i>
+                <span>Educació Primària i Secundària</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-6 flex flex-col gap-6">
+        
+        <!-- PANTALLA DE CONFIGURACIÓ I SELECCIÓ DE NIVELL -->
+        <section id="config-screen" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Columna esquerra: Explicació del Mètode -->
+            <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+                            <i data-lucide="info" class="w-6 h-6"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">El Mètode Quinzet</h2>
+                    </div>
+                    <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                        Aquest sistema té com a objectiu principal l'automatització de les operacions aritmètiques elementals mitjançant la pràctica diària.
+                    </p>
+                    <div class="space-y-3 mb-6">
+                        <div class="flex gap-3 text-xs bg-emerald-50 text-emerald-800 p-3 rounded-xl border border-emerald-100">
+                            <i data-lucide="check-circle" class="w-5 h-5 shrink-0 text-emerald-600"></i>
+                            <div>
+                                <span class="font-bold">Objectiu ideal:</span> Respondre unes 50 o més operacions correctes en 2 minuts.
+                            </div>
+                        </div>
+                        <div class="flex gap-3 text-xs bg-amber-50 text-amber-800 p-3 rounded-xl border border-amber-100">
+                            <i data-lucide="trending-up" class="w-5 h-5 shrink-0 text-amber-600"></i>
+                            <div>
+                                <span class="font-bold">Regla d'or:</span> Si fas menys de 15, baixa de nivell. Si fas 50 o més, puja de nivell!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-slate-100 p-4 rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider mb-2">Instruccions de la prova</h3>
+                    <ul class="text-xs text-slate-600 space-y-1.5 list-disc list-inside">
+                        <li>Tens exactament 2 minuts (120 segons).</li>
+                        <li>S'ha de respondre en ordre de dalt a baix per columnes.</li>
+                        <li>Pots saltar-te operacions si no les saps.</li>
+                        <li>Supera el teu propi rècord de forma diària!</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Columna dreta: Selecció de Curs, Operació i Inici (Ocupa 2 columnes) -->
+            <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-2.5 bg-amber-50 text-amber-600 rounded-xl">
+                            <i data-lucide="sliders" class="w-6 h-6"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">Paràmetres de la Sèrie</h2>
+                    </div>
+
+                    <!-- Selecció de Nivell / Curs -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">1. Selecciona el Nivell de Curs:</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="course-selector">
+                            <!-- Es genera dinàmicament amb JS -->
+                        </div>
+                    </div>
+
+                    <!-- Selecció d'Operació -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">2. Tria l'Operació:</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="operation-selector">
+                            <!-- Es genera dinàmicament amb JS -->
+                        </div>
+                    </div>
+
+                    <!-- Detalls del Nivell Seleccionat -->
+                    <div class="bg-blue-50/50 border border-blue-100 p-4 rounded-xl mb-6">
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="target" class="w-5 h-5 text-blue-600 mt-0.5"></i>
+                            <div>
+                                <h4 class="font-bold text-slate-800 text-sm" id="selected-level-title">Carregant nivell...</h4>
+                                <p class="text-xs text-slate-600 mt-1" id="selected-level-desc">Descripció del nivell de dificultat actual.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botó d'Inici de test -->
+                <div class="flex justify-end border-t border-slate-100 pt-6">
+                    <button onclick="startTest()" class="w-full sm:w-1/2 bg-blue-600 hover:bg-blue-700 active:transform active:scale-[0.98] transition-all text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 text-base ml-auto">
+                        <i data-lucide="play" class="w-5 h-5"></i>
+                        Començar Prova (2 min)
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- PANTALLA DE LA PROVA INTERACTIVA -->
+        <section id="test-screen" class="hidden flex-col gap-6">
+            
+            <!-- Barra superior d'estat (Temporitzador, Progrés) -->
+            <div class="bg-slate-900 text-white p-4 rounded-2xl flex flex-col md:flex-row justify-between items-center gap-4 shadow-md">
+                <div class="flex items-center gap-3">
+                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <div>
+                        <div class="text-xs text-slate-400 font-bold uppercase tracking-wider">Estat de la Prova</div>
+                        <div class="font-semibold text-sm text-slate-200">En execució</div>
+                    </div>
+                    <div class="h-6 w-px bg-slate-700 mx-2"></div>
+                    <div>
+                        <div class="text-xs text-slate-400 font-bold uppercase tracking-wider">Sèrie actual</div>
+                        <div class="font-semibold text-sm text-amber-400" id="current-series-display">Nivell - Operació</div>
+                    </div>
+                </div>
+
+                <!-- Temporitzador central gran -->
+                <div class="flex items-center gap-4 bg-slate-800 px-5 py-2.5 rounded-xl border border-slate-700 min-w-[160px] justify-center">
+                    <i data-lucide="timer" class="w-6 h-6 text-amber-400 animate-spin-slow"></i>
+                    <span class="text-2xl font-black font-mono tracking-wider text-amber-300" id="timer-display">02:00</span>
+                </div>
+
+                <!-- Botons d'acció ràpida -->
+                <div class="flex gap-2">
+                    <button onclick="confirmExit()" class="px-4 py-2 bg-slate-800 hover:bg-red-900/30 text-slate-300 hover:text-red-400 transition-colors rounded-xl text-xs font-bold border border-slate-700 flex items-center gap-1.5">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        Sortir
+                    </button>
+                    <button onclick="finishTest()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white transition-colors rounded-xl text-xs font-bold shadow-md shadow-blue-500/10 flex items-center gap-1.5">
+                        <i data-lucide="check-square" class="w-4 h-4"></i>
+                        He acabat!
+                    </button>
+                </div>
+            </div>
+
+            <!-- Graella de 4 columnes de 15 operacions = 60 en total -->
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 overflow-x-auto">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 min-w-[760px]">
+                    <!-- Columna 1 -->
+                    <div class="space-y-3">
+                        <div class="bg-slate-100 text-slate-600 font-black text-xs text-center py-1.5 rounded-lg uppercase tracking-wider">Columna A</div>
+                        <div id="col-0" class="space-y-2"></div>
+                    </div>
+                    <!-- Columna 2 -->
+                    <div class="space-y-3">
+                        <div class="bg-slate-100 text-slate-600 font-black text-xs text-center py-1.5 rounded-lg uppercase tracking-wider">Columna B</div>
+                        <div id="col-1" class="space-y-2"></div>
+                    </div>
+                    <!-- Columna 3 -->
+                    <div class="space-y-3">
+                        <div class="bg-slate-100 text-slate-600 font-black text-xs text-center py-1.5 rounded-lg uppercase tracking-wider">Columna C</div>
+                        <div id="col-2" class="space-y-2"></div>
+                    </div>
+                    <!-- Columna 4 -->
+                    <div class="space-y-3">
+                        <div class="bg-slate-100 text-slate-600 font-black text-xs text-center py-1.5 rounded-lg uppercase tracking-wider">Columna D</div>
+                        <div id="col-3" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teclat numèric en pantalla per a dispositius mòbils -->
+            <div class="block lg:hidden bg-white p-4 rounded-2xl shadow-md border border-slate-100 max-w-sm mx-auto w-full">
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" onclick="pressKey(1)" class="py-4 bg-slate-100 active:bg-slate-200 text-xl font-bold rounded-xl">1</button>
+                    <button type="button" onclick="pressKey(2)" class="py-4 bg-slate-100 active:bg-slate-200 text-xl font-bold rounded-xl">2</button>
+                    <button type="button" onclick="pressKey(3)" class="py-4 bg-slate-100 active:bg-slate-200 text-xl font-bold rounded-xl">3</button>
+                    <button type="button" onclick="pressKey(4)" class="py-4 bg-slate-100 active:bg-slate-200 text-xl font-bold rounded-xl">4</button>
+                    <button type="button" onclick="pressKey(5)" class="py-4 bg-slate-100 active:bg-slate-200 text-xl font-bold rounded-xl">5</button>
+                    <button type="button" onclick="pressKey(6)" class="py-4 bg-slate-100 active:bg-slate-200 text-xl font-bold rounded-xl">6</button>
+                    <button type="button" onclick="pressKey(7)" class="py-4 bg-slate-100 active:bg-slate-200 text-xl font-bold rounded-xl">7</button>
+                    <button type="button" onclick="pressKey(8)" class="py-4 bg-slate-100 active:bg-slate-200 text-xl font-bold rounded-xl">8</button>
+                    <button type="button" onclick="pressKey(9)" class="py-4 bg-slate-100 active:bg-slate-200 text-xl font-bold rounded-xl">9</button>
+                    <button type="button" onclick="pressKey('clear')" class="py-4 bg-red-50 text-red-600 active:bg-red-100 text-sm font-bold rounded-xl uppercase">Borrar</button>
+                    <button type="button" onclick="pressKey(0)" class="py-4 bg-slate-100 active:bg-slate-200 text-xl font-bold rounded-xl">0</button>
+                    <button type="button" onclick="pressKey('next')" class="py-4 bg-blue-600 text-white active:bg-blue-700 text-sm font-bold rounded-xl uppercase flex items-center justify-center"><i data-lucide="arrow-down" class="w-5 h-5"></i></button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- PANTALLA DE RESULTATS I RETROALIMENTACIÓ -->
+        <section id="results-screen" class="hidden grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Columna de Resultat Principal -->
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 flex flex-col justify-between items-center text-center">
+                <div class="w-full">
+                    <div class="text-sm font-black uppercase tracking-wider text-slate-500 mb-2">Sèrie Finalitzada</div>
+                    <h2 class="text-3xl font-black text-slate-800 mb-6" id="results-title">Resultats</h2>
+                    
+                    <!-- Cercle de puntuació -->
+                    <div class="w-32 h-32 bg-blue-50 border-4 border-blue-500 rounded-full flex flex-col items-center justify-center mx-auto mb-6 shadow-sm">
+                        <span class="text-5xl font-black text-blue-600" id="score-display">0</span>
+                        <span class="text-xs font-bold text-blue-400 uppercase tracking-widest">Correctes</span>
+                    </div>
+
+                    <div class="space-y-2 mb-6 text-sm text-slate-600">
+                        <p>Total contestades: <strong id="total-answered">0</strong> / 60</p>
+                        <p>Total errors: <strong class="text-red-500" id="total-errors">0</strong></p>
+                    </div>
+                </div>
+
+                <div class="w-full">
+                    <button onclick="restartTest()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-blue-500/10 flex items-center justify-center gap-2 mb-2 transition-all">
+                        <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                        Tornar a provar
+                    </button>
+                    <button onclick="goToConfig()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-2 transition-all">
+                        <i data-lucide="home" class="w-5 h-5"></i>
+                        Menú Principal
+                    </button>
+                </div>
+            </div>
+
+            <!-- Columna de Consell i Recomanació del Mètode -->
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2.5 bg-amber-50 text-amber-600 rounded-xl">
+                            <i data-lucide="sparkles" class="w-6 h-6"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">Recomanació</h2>
+                    </div>
+
+                    <!-- Targeta de decisió dinàmica (Pujar, baixar o mantenir) -->
+                    <div id="recommendation-box" class="p-4 rounded-xl mb-6 flex gap-3 items-start">
+                        <!-- S'omple dinàmicament -->
+                    </div>
+
+                    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                        El mètode de <strong>El Quinzet</strong> recomana fer aquesta mateixa sèrie 3 cops per setmana fins que aconsegueixis dominar-la abans de fer el canvi definitiu.
+                    </p>
+                </div>
+
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <h4 class="font-bold text-xs text-blue-800 uppercase tracking-wider mb-1">Rècord anterior</h4>
+                    <p class="text-sm text-blue-900" id="last-record-display">Encara no tenies cap registre d'aquest nivell.</p>
+                </div>
+            </div>
+
+            <!-- Columna d'Historial d'Intents -->
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-100 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-2.5 bg-violet-50 text-violet-600 rounded-xl">
+                            <i data-lucide="history" class="w-6 h-6"></i>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-800">Historial d'Intents</h2>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-4">Aquests són els teus darrers intents d'aquesta sessió o dispositiu.</p>
+                    
+                    <div class="space-y-2 max-h-[220px] overflow-y-auto pr-1" id="history-list">
+                        <!-- Es genera dinàmicament -->
+                    </div>
+                </div>
+
+                <button onclick="clearCurrentHistory()" class="mt-4 text-xs font-bold text-red-500 hover:text-red-700 flex items-center justify-center gap-1 py-2">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    Esborrar dades guardades
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Modal d'ajuda o confirmació personalitzat -->
+    <div id="custom-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+            <div class="flex items-center gap-3 mb-4 text-red-600" id="modal-header-container">
+                <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                <h3 class="text-lg font-bold" id="modal-title">Atenció</h3>
+            </div>
+            <p class="text-slate-600 text-sm mb-6" id="modal-body">Estàs segur que vols abandonar la prova actual? Perdràs tot el progrés que portes acumulat en aquesta sessió.</p>
+            <div class="flex justify-end gap-3" id="modal-actions">
+                <!-- Accions dinàmiques del modal -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Peu de pàgina -->
+    <footer class="bg-slate-100 border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        <p>© Lluís Segarra Neira — El Quinzet (Mètode de Rapidesa de Càlcul Mental)</p>
+        <p class="mt-1 text-slate-400">Desenvolupat per a ús educatiu interactiu adaptat de la versió de referència.</p>
+    </footer>
+
+    <!-- LÒGICA I BASE DE DADES DE L'APLICACIÓ -->
+    <script>
+        // CONFIGURACIÓ DE NIVELLS I OPERACIONS BASADES EN EL PDF DE EL QUINZET
+        const CONFIG_NIVELLS = {
+            "abans-1r": {
+                name: "Abans de Primer",
+                sumes: {
+                    title: "Sumes bàsiques fins al 5",
+                    desc: "Operacions elementals de suma amb operands de l'1 al 4, sumant 0, 1, 2, 3 i 4. Ideal per començar.",
+                    generate: () => {
+                        const operands = [
+                            [1,3], [2,1], [1,3], [2,1], [1,2], [2,2], [2,2], [0,1], [1,0], [2,0],
+                            [2,1], [2,1], [1,1], [2,2], [3,0], [1,3], [1,4], [2,1], [2,3], [0,4],
+                            [1,3], [2,3], [3,0], [2,1], [1,1], [2,1], [1,3], [1,3], [1,2], [2,4],
+                            [1,2], [3,1], [1,3], [2,2], [0,3], [4,1], [1,4], [2,0], [3,0], [2,3],
+                            [1,3], [2,2], [2,1], [1,2], [1,0], [2,3], [3,1], [3,1], [1,4], [2,2],
+                            [1,1], [3,2], [1,2], [2,1], [1,2], [4,1], [1,1], [2,3], [1,3], [2,3]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '+' }));
+                    }
+                },
+                restes: {
+                    title: "Restes molt fàcils fins al 4",
+                    desc: "Restes elementals amb minuends fins a 4 i resultats positius o zero.",
+                    generate: () => {
+                        const operands = [
+                            [2,1], [3,2], [3,2], [4,2], [2,0], [2,2], [2,1], [4,1], [3,1], [3,1],
+                            [4,1], [3,1], [3,2], [2,1], [4,2], [2,1], [3,1], [3,2], [4,4], [4,2],
+                            [2,2], [4,3], [3,3], [3,2], [3,2], [3,2], [2,0], [2,2], [3,1], [4,1],
+                            [3,0], [3,0], [2,1], [2,2], [4,4], [4,0], [1,1], [3,2], [3,2], [3,3],
+                            [3,2], [3,1], [4,3], [2,2], [2,1], [3,3], [2,1], [4,2], [3,3], [1,0],
+                            [3,2], [4,3], [1,0], [2,1], [3,1], [2,1], [3,3], [3,2], [4,3], [3,2]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '-' }));
+                    }
+                }
+            },
+            "primer": {
+                name: "Primer de Primària",
+                sumes: {
+                    title: "Sumes bàsiques de primer nivell",
+                    desc: "Suma de nombres fins a un dígit, afegint valors de l'1 al 5.",
+                    generate: () => {
+                        const operands = [
+                            [2,3], [1,5], [3,3], [4,2], [2,2], [1,2], [3,1], [4,0], [2,0], [1,3],
+                            [3,0], [4,1], [2,1], [1,2], [3,2], [4,3], [2,4], [1,1], [3,3], [4,2],
+                            [2,3], [1,4], [3,2], [4,1], [2,1], [1,2], [3,1], [4,4], [2,2], [1,5],
+                            [3,3], [4,3], [2,3], [1,3], [3,2], [4,1], [2,4], [1,0], [3,0], [4,0],
+                            [2,3], [1,2], [3,3], [4,4], [2,0], [1,3], [3,1], [4,5], [2,4], [1,5],
+                            [3,4], [4,2], [2,2], [1,1], [3,2], [4,1], [2,1], [1,2], [3,0], [4,3]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '+' }));
+                    }
+                },
+                restes: {
+                    title: "Restes bàsiques fins a 6",
+                    desc: "Restes amb minuends petits que arriben com a màxim fins a 6.",
+                    generate: () => {
+                        const operands = [
+                            [4,3], [5,1], [6,2], [4,3], [3,0], [4,4], [5,1], [6,6], [4,1], [4,2],
+                            [4,1], [5,0], [3,3], [5,2], [3,2], [4,2], [4,1], [2,1], [5,4], [6,5],
+                            [3,2], [4,3], [6,3], [5,2], [2,2], [3,2], [5,2], [4,4], [1,1], [2,0],
+                            [4,3], [3,1], [4,2], [5,4], [6,4], [6,3], [3,2], [2,2], [3,2], [5,5],
+                            [3,1], [3,1], [5,3], [6,4], [2,1], [5,3], [4,1], [4,2], [3,3], [4,0],
+                            [4,2], [5,4], [1,0], [3,1], [6,5], [6,1], [4,2], [4,1], [4,4], [3,2]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '-' }));
+                    }
+                }
+            },
+            "segon": {
+                name: "Segon de Primària",
+                sumes: {
+                    title: "Sumes avançades d'un dígit",
+                    desc: "Sumes que combinen de forma aleatòria operands fins a 9. Introducció al pas de desena.",
+                    generate: () => {
+                        const operands = [
+                            [2,3], [1,6], [3,3], [4,2], [2,6], [1,9], [3,6], [4,5], [2,9], [1,7],
+                            [3,9], [4,1], [2,5], [1,3], [3,2], [4,3], [2,3], [1,1], [3,8], [4,8],
+                            [2,5], [1,8], [3,7], [4,7], [2,4], [1,4], [3,3], [4,9], [2,9], [1,5],
+                            [3,5], [4,6], [2,6], [1,6], [3,4], [4,5], [2,7], [1,0], [3,0], [4,7],
+                            [2,5], [1,2], [3,3], [4,4], [2,0], [1,3], [3,6], [4,9], [2,4], [1,5],
+                            [3,7], [4,2], [2,7], [1,8], [3,2], [4,1], [2,3], [1,7], [3,0], [4,7]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '+' }));
+                    }
+                },
+                restes: {
+                    title: "Restes amb nombres fins a 10",
+                    desc: "Restes variades on utilitzem minuends fins a 10 i subtrahends d'una xifra.",
+                    generate: () => {
+                        const operands = [
+                            [5,4], [7,6], [9,7], [8,3], [5,5], [6,5], [9,1], [10,7], [5,1], [4,2],
+                            [5,1], [10,9], [4,3], [2,1], [5,3], [9,6], [5,2], [1,1], [7,5], [7,4],
+                            [5,1], [3,2], [7,3], [9,7], [3,1], [5,1], [4,0], [6,5], [2,2], [6,1],
+                            [4,2], [7,3], [5,3], [5,4], [7,4], [10,3], [4,2], [2,0], [6,5], [5,4],
+                            [4,3], [6,5], [6,3], [7,2], [4,0], [6,5], [4,1], [4,1], [3,0], [5,0],
+                            [4,3], [6,3], [2,1], [3,1], [8,6], [8,6], [5,1], [4,4], [8,2], [8,2]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '-' }));
+                    }
+                }
+            },
+            "tercer": {
+                name: "Tercer de Primària",
+                sumes: {
+                    title: "Sumes creuant la desena",
+                    desc: "Sumes complexes de nombres d'un sol dígit (8 i 9) amb valors del 2 al 9.",
+                    generate: () => {
+                        const operands = [
+                            [8,3], [5,6], [9,3], [4,2], [8,6], [5,9], [9,6], [4,5], [8,9], [5,7],
+                            [9,9], [4,8], [8,5], [5,3], [9,2], [4,3], [8,3], [5,6], [9,8], [4,8],
+                            [8,5], [5,8], [9,7], [4,7], [8,4], [5,7], [9,3], [4,9], [8,9], [5,5],
+                            [9,5], [4,6], [8,6], [5,6], [9,4], [4,5], [8,7], [5,3], [9,8], [4,7],
+                            [8,5], [5,9], [9,3], [4,4], [8,8], [5,3], [9,6], [4,9], [8,4], [5,5],
+                            [9,7], [4,2], [8,7], [5,8], [9,2], [4,6], [8,3], [5,7], [9,9], [4,7]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '+' }));
+                    }
+                },
+                restes: {
+                    title: "Restes amb minuends fins a 10",
+                    desc: "Restes ràpides que requereixen agilitat mental per sota de la primera desena.",
+                    generate: () => {
+                        const operands = [
+                            [7,4], [9,5], [8,7], [9,6], [8,6], [10,7], [9,5], [9,2], [10,7], [8,4],
+                            [10,5], [6,4], [8,5], [7,2], [9,3], [7,6], [8,5], [7,4], [10,8], [9,2],
+                            [7,4], [10,6], [8,3], [5,2], [10,3], [8,7], [10,5], [7,3], [6,2], [9,4],
+                            [9,7], [8,6], [9,2], [10,4], [9,7], [10,3], [7,5], [9,8], [7,4], [7,5],
+                            [7,2], [4,3], [10,5], [7,4], [6,2], [8,3], [10,7], [10,9], [8,6], [10,8],
+                            [9,7], [8,5], [7,3], [10,3], [9,4], [7,3], [9,7], [6,3], [10,6], [8,2]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '-' }));
+                    }
+                },
+                multiplicacions: {
+                    title: "Taules de multiplicar elementals",
+                    desc: "Primeres multiplicacions barrejant de les taules del 1 al 5.",
+                    generate: () => {
+                        const operands = [
+                            [1,8], [2,7], [3,5], [2,8], [3,9], [2,4], [1,5], [4,3], [2,9], [3,8],
+                            [2,3], [5,1], [4,0], [8,2], [5,4], [2,4], [3,7], [2,2], [2,6], [3,6],
+                            [1,7], [1,3], [5,2], [5,3], [4,6], [3,7], [2,9], [1,6], [2,6], [2,8],
+                            [2,6], [2,7], [1,9], [2,5], [3,7], [3,5], [5,8], [5,2], [4,5], [4,2],
+                            [3,9], [3,8], [2,2], [2,5], [3,9], [2,4], [4,0], [5,8], [4,4], [3,3],
+                            [2,7], [1,7], [5,7], [5,3], [3,7], [3,2], [2,4], [1,7], [3,3], [2,8]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: 'x' }));
+                    }
+                }
+            },
+            "quart": {
+                name: "Quart de Primària",
+                sumes: {
+                    title: "Sumes ràpides amb patrons (9, 6, 3, 5)",
+                    desc: "Agrupacions de sumes sistemàtiques afegint nombres clau ràpidament.",
+                    generate: () => {
+                        const operands = [
+                            [9,3], [9,6], [9,9], [9,5], [9,3], [9,5], [9,4], [9,9], [9,6], [9,7],
+                            [9,5], [9,9], [9,4], [9,7], [9,3], [6,4], [6,9], [6,7], [6,3], [6,6],
+                            [6,8], [6,7], [6,5], [6,6], [6,3], [6,9], [6,3], [6,4], [6,8], [6,7],
+                            [3,3], [3,6], [3,9], [3,2], [3,8], [3,7], [3,3], [3,5], [3,4], [3,8],
+                            [3,3], [3,6], [3,7], [3,2], [3,9], [5,2], [5,5], [5,8], [5,3], [5,8],
+                            [5,7], [5,9], [5,6], [5,5], [5,7], [5,4], [5,9], [5,2], [5,6], [5,7]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '+' }));
+                    }
+                },
+                restes: {
+                    title: "Restes creuant la desena (minuends fins a 18)",
+                    desc: "Restes més complexes on s'ha d'operar creuant el llindar de la desena (ex: 13-7, 17-6).",
+                    generate: () => {
+                        const operands = [
+                            [7,4], [7,5], [13,7], [17,6], [9,7], [10,7], [7,5], [12,7], [11,7], [8,4],
+                            [13,5], [6,4], [14,8], [17,2], [7,3], [7,6], [13,5], [8,5], [15,8], [10,6],
+                            [7,4], [17,6], [13,8], [5,2], [14,3], [8,7], [11,5], [17,6], [7,2], [17,4],
+                            [12,7], [14,7], [6,2], [13,4], [7,7], [15,3], [14,5], [9,8], [17,4], [7,5],
+                            [13,6], [4,3], [17,5], [11,6], [6,2], [8,3], [16,7], [18,6], [8,6], [17,8],
+                            [17,7], [18,5], [17,3], [10,3], [12,4], [7,3], [14,7], [6,3], [13,6], [8,2]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '-' }));
+                    }
+                },
+                multiplicacions: {
+                    title: "Taules de multiplicar completes (fins a 9)",
+                    desc: "Pràctica exhaustiva de multiplicacions ràpides de totes les taules d'un dígit.",
+                    generate: () => {
+                        const operands = [
+                            [2,8], [5,7], [4,5], [7,8], [3,9], [8,4], [9,5], [6,3], [4,9], [3,8],
+                            [4,3], [8,6], [6,5], [8,5], [9,4], [7,4], [3,7], [9,2], [4,8], [6,6],
+                            [7,2], [8,3], [7,6], [9,3], [5,6], [9,7], [2,9], [3,6], [2,6], [8,8],
+                            [9,6], [4,7], [8,9], [3,5], [7,7], [5,5], [9,8], [6,2], [7,5], [4,2],
+                            [7,9], [5,8], [8,2], [2,5], [6,9], [2,4], [4,4], [7,8], [5,4], [2,3],
+                            [8,7], [6,7], [3,7], [5,3], [7,3], [5,2], [3,4], [9,7], [3,3], [6,8]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: 'x' }));
+                    }
+                },
+                divisions: {
+                    title: "Divisions exactes d'una xifra",
+                    desc: "L'operació inversa a la multiplicació. Càlcul ràpid mental de divisions sense residu.",
+                    generate: () => {
+                        const operands = [
+                            [28,7], [12,4], [72,8], [27,9], [27,3], [36,6], [27,9], [24,6], [14,7], [30,6],
+                            [18,9], [16,4], [40,8], [48,6], [50,5], [24,8], [36,9], [40,8], [28,7], [63,9],
+                            [24,3], [18,6], [42,7], [48,6], [81,9], [32,8], [28,7], [72,8], [12,3], [36,6],
+                            [12,4], [21,7], [30,5], [24,8], [27,3], [28,4], [21,3], [18,3], [15,5], [72,9],
+                            [48,6], [24,4], [21,7], [40,8], [24,4], [18,3], [18,2], [80,8], [35,5], [16,4],
+                            [72,8], [40,5], [24,6], [16,2], [20,5], [56,7], [14,2], [15,5], [63,7], [35,7]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '/' }));
+                    }
+                }
+            },
+            "cinque": {
+                name: "Cinquè de Primària",
+                sumes: {
+                    title: "Sumes ràpides sistemàtiques (7, 9, 6, 8)",
+                    desc: "Automatització afegint valors com 7, 8 i 9 a grans velocitats.",
+                    generate: () => {
+                        const operands = [
+                            [7,3], [7,6], [7,9], [7,5], [7,3], [7,5], [7,4], [7,9], [7,6], [7,4],
+                            [7,5], [7,6], [7,4], [7,7], [7,3], [9,6], [9,2], [9,7], [9,3], [9,6],
+                            [9,8], [9,7], [9,9], [9,6], [9,3], [9,4], [9,3], [9,5], [9,8], [9,7],
+                            [6,3], [6,6], [6,9], [6,2], [6,8], [6,7], [6,3], [6,5], [6,4], [6,8],
+                            [6,3], [6,6], [6,7], [6,2], [6,9], [8,2], [8,5], [8,8], [8,3], [8,8],
+                            [8,7], [8,9], [8,6], [8,5], [8,7], [8,4], [8,9], [8,2], [8,6], [8,7]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '+' }));
+                    }
+                },
+                restes: {
+                    title: "Restes combinades de dues xifres",
+                    desc: "Restes ràpides creuant desenes en valors fins a la segona desena.",
+                    generate: () => {
+                        const operands = [
+                            [9,4], [9,5], [13,7], [16,9], [9,6], [10,7], [9,5], [12,9], [11,7], [8,4],
+                            [13,5], [6,4], [14,8], [17,2], [9,3], [7,6], [13,5], [8,5], [15,8], [10,6],
+                            [7,4], [16,6], [13,8], [5,2], [14,3], [8,7], [11,5], [17,9], [7,2], [19,4],
+                            [12,7], [14,6], [9,2], [13,4], [9,7], [15,3], [14,5], [9,8], [17,4], [7,5],
+                            [13,9], [4,3], [17,5], [11,9], [6,2], [8,3], [16,7], [18,9], [8,6], [17,8],
+                            [19,7], [18,5], [17,3], [10,3], [12,4], [7,3], [14,7], [6,3], [13,6], [8,2]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '-' }));
+                    }
+                },
+                multiplicacions: {
+                    title: "Multiplicació ràpida (Taules altes)",
+                    desc: "Enfasi especial en les taules del 6 al 9 sota pressió de temps.",
+                    generate: () => {
+                        const operands = [
+                            [9,8], [5,8], [4,5], [8,9], [3,9], [8,4], [9,5], [6,4], [4,9], [7,8],
+                            [4,3], [8,6], [6,5], [8,6], [9,4], [8,5], [3,8], [9,6], [4,8], [6,6],
+                            [9,8], [8,3], [7,6], [9,3], [5,6], [7,9], [2,9], [3,6], [9,6], [8,8],
+                            [9,6], [4,8], [8,9], [3,5], [8,7], [5,5], [9,8], [6,9], [7,5], [4,9],
+                            [8,9], [5,8], [8,9], [9,5], [9,9], [9,5], [4,6], [6,8], [5,4], [9,3],
+                            [8,7], [6,8], [3,8], [5,3], [3,7], [5,9], [6,3], [9,7], [3,3], [6,8]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: 'x' }));
+                    }
+                },
+                divisions: {
+                    title: "Divisions d'una xifra amb dividends fins a 100",
+                    desc: "Divisions més complexes, algunes amb dividends superiors a 80.",
+                    generate: () => {
+                        const operands = [
+                            [56,7], [36,4], [64,8], [54,9], [27,3], [36,6], [45,9], [48,6], [49,7], [24,6],
+                            [63,9], [16,4], [24,8], [42,6], [45,5], [24,8], [72,9], [56,8], [28,7], [36,9],
+                            [24,3], [30,6], [35,7], [18,6], [81,9], [40,8], [21,7], [64,8], [18,3], [32,4],
+                            [12,3], [18,9], [42,6], [24,8], [30,3], [20,4], [16,8], [24,3], [15,3], [27,9],
+                            [48,6], [24,4], [42,7], [40,8], [28,4], [18,2], [16,2], [80,8], [25,5], [6,2],
+                            [72,4], [50,5], [54,6], [12,4], [14,2], [70,7], [14,7], [15,5], [56,7], [50,5]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '/' }));
+                    }
+                }
+            },
+            "sise": {
+                name: "Sisè de Primària",
+                sumes: {
+                    title: "Sumes ràpides d'un i dos dígits",
+                    desc: "Sumes de patrons fixes com 9, 7, 8 i 6 amb nombres fins a 9.",
+                    generate: () => {
+                        const operands = [
+                            [9,4], [9,2], [9,6], [9,5], [9,9], [9,3], [9,7], [9,5], [9,8], [9,3],
+                            [9,8], [9,5], [9,9], [9,7], [9,2], [7,4], [7,2], [7,6], [7,4], [7,9],
+                            [7,3], [7,7], [7,5], [7,9], [7,1], [7,8], [7,6], [7,9], [7,4], [7,6],
+                            [8,5], [8,2], [8,6], [8,7], [8,6], [8,9], [8,4], [8,2], [8,7], [8,4],
+                            [8,8], [8,9], [8,7], [8,3], [8,4], [6,9], [6,2], [6,5], [6,7], [6,4],
+                            [6,8], [6,6], [6,9], [6,5], [6,2], [6,6], [6,7], [6,5], [6,3], [6,7]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '+' }));
+                    }
+                },
+                restes: {
+                    title: "Restes de desena fixa (10, 11, 12, 13)",
+                    desc: "Restes agrupades per minuends fixos, ideal per fixar mecanismes de deducció ràpida.",
+                    generate: () => {
+                        const operands = [
+                            [10,4], [10,2], [10,8], [10,4], [10,6], [10,4], [10,7], [10,2], [10,6], [10,4],
+                            [10,6], [10,9], [10,4], [10,1], [10,5], [12,6], [12,2], [12,7], [12,4], [12,9],
+                            [12,5], [12,8], [12,3], [12,6], [12,4], [12,8], [12,9], [12,4], [12,7], [12,5],
+                            [11,9], [11,2], [11,6], [11,4], [11,8], [11,7], [11,5], [11,2], [11,6], [11,4],
+                            [11,7], [11,5], [11,3], [11,2], [11,6], [13,9], [13,8], [13,5], [13,7], [13,9],
+                            [13,8], [13,6], [13,9], [13,7], [13,8], [13,4], [13,5], [13,6], [13,7], [13,9]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '-' }));
+                    }
+                },
+                multiplicacions: {
+                    title: "Multiplicació per desenes i nombres de dos dígits (ex: 15x2, 12x2)",
+                    desc: "Introducció de multiplicacions de valors habituals (10, 11, 12, 14, 15) ràpidament.",
+                    generate: () => {
+                        const operands = [
+                            [9,4], [15,2], [10,3], [9,4], [11,6], [8,4], [9,7], [8,9], [11,6], [7,6],
+                            [6,9], [10,4], [15,3], [7,4], [11,6], [9,2], [8,2], [7,3], [4,9], [9,6],
+                            [15,2], [12,2], [5,3], [3,8], [10,2], [14,2], [8,6], [6,7], [7,8], [9,4],
+                            [14,2], [15,2], [10,5], [8,4], [9,6], [7,9], [6,9], [15,3], [12,2], [8,6],
+                            [4,9], [7,5], [15,3], [9,7], [7,6], [6,3], [8,9], [7,4], [4,8], [9,6],
+                            [6,5], [10,9], [15,2], [8,3], [14,2], [11,6], [9,5], [7,4], [7,9], [8,7]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: 'x' }));
+                    }
+                },
+                divisions: {
+                    title: "Divisions d'una i dues xifres",
+                    desc: "Divisions on s'inclouen divisors fins a 9 i dividends de fins a 90 ràpids.",
+                    generate: () => {
+                        const operands = [
+                            [12,2], [18,3], [12,4], [24,6], [54,9], [40,4], [36,9], [14,2], [12,2], [32,4],
+                            [64,8], [28,4], [36,6], [28,7], [56,8], [15,5], [24,2], [12,6], [25,5], [72,9],
+                            [80,8], [56,7], [36,6], [56,8], [63,9], [60,6], [32,8], [36,4], [18,3], [66,6],
+                            [56,8], [48,6], [42,6], [81,9], [33,3], [72,9], [36,9], [45,5], [72,8], [49,7],
+                            [54,9], [25,5], [63,9], [72,8], [72,9], [49,7], [36,4], [81,9], [64,8], [90,9],
+                            [56,7], [16,4], [48,6], [60,6], [54,9], [80,8], [32,4], [63,7], [56,8], [24,4]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '/' }));
+                    }
+                }
+            },
+            "despres-sise": {
+                name: "Després de Sisè",
+                sumes: {
+                    title: "Sumes avançades de segona desena (12, 14, 13, 18)",
+                    desc: "Sumes on el primer operand és de dues xifres i el segon és d'una xifra.",
+                    generate: () => {
+                        const operands = [
+                            [12,9], [12,7], [12,5], [12,3], [12,8], [12,6], [12,4], [12,2], [12,9], [12,6],
+                            [12,7], [12,5], [12,8], [12,4], [12,0], [14,6], [14,9], [14,7], [14,3], [14,6],
+                            [14,8], [14,7], [14,5], [14,6], [14,3], [14,9], [14,3], [14,5], [14,8], [14,7],
+                            [13,5], [13,3], [13,6], [13,9], [13,2], [13,8], [13,7], [13,3], [13,4], [13,8],
+                            [13,3], [13,6], [13,7], [13,2], [13,9], [18,3], [18,6], [18,5], [18,9], [18,5],
+                            [18,3], [18,5], [18,4], [18,9], [18,6], [18,7], [18,5], [18,4], [18,7], [18,3]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '+' }));
+                    }
+                },
+                restes: {
+                    title: "Restes de segona desena (16, 11, 12, 13)",
+                    desc: "Restes ràpides on restem nombres de l'1 al 9 a nombres de dues xifres.",
+                    generate: () => {
+                        const operands = [
+                            [16,4], [16,2], [16,6], [16,4], [16,6], [16,4], [16,8], [16,2], [16,6], [16,4],
+                            [16,6], [16,4], [16,2], [16,5], [16,4], [11,6], [11,2], [11,9], [11,4], [11,7],
+                            [11,1], [11,5], [11,2], [11,6], [11,4], [11,6], [11,9], [11,7], [11,2], [11,8],
+                            [12,4], [12,2], [12,6], [12,9], [12,6], [12,8], [12,4], [12,3], [12,6], [12,4],
+                            [12,7], [12,5], [12,8], [12,5], [12,9], [13,9], [13,8], [13,5], [13,8], [13,9],
+                            [13,8], [13,7], [13,2], [13,7], [13,8], [13,5], [13,9], [13,6], [13,7], [13,4]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '-' }));
+                    }
+                },
+                multiplicacions: {
+                    title: "Multiplicació de nombres complexos (ex: 15x4, 11x8)",
+                    desc: "Multiplicació de nombres fins a 15 de memòria. Requereix alt nivell de retenció.",
+                    generate: () => {
+                        const operands = [
+                            [9,7], [15,4], [10,7], [9,3], [11,8], [8,9], [9,5], [8,7], [11,5], [7,9],
+                            [6,7], [10,6], [15,2], [7,8], [11,7], [9,9], [8,7], [7,7], [4,8], [9,7],
+                            [15,3], [12,4], [5,6], [3,7], [10,4], [14,5], [8,7], [6,6], [7,7], [9,6],
+                            [14,5], [15,3], [10,4], [8,5], [9,8], [7,6], [6,8], [15,2], [12,4], [8,9],
+                            [4,6], [7,8], [15,4], [9,7], [7,8], [6,9], [8,8], [7,6], [4,7], [9,4],
+                            [7,9], [11,7], [15,3], [8,4], [14,2], [11,5], [9,7], [7,6], [7,8], [8,6]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: 'x' }));
+                    }
+                },
+                divisions: {
+                    title: "Divisions de memòria amb nombres fins a 12 (ex: 48:12)",
+                    desc: "Divisions avançades incloent divisors de dues xifres com 11 o 12.",
+                    generate: () => {
+                        const operands = [
+                            [16,4], [18,9], [12,3], [24,4], [42,7], [40,8], [36,6], [14,7], [12,6], [32,8],
+                            [64,8], [28,7], [36,6], [28,4], [27,3], [30,5], [24,2], [36,6], [25,5], [81,9],
+                            [80,8], [63,7], [56,7], [32,8], [56,8], [63,9], [70,7], [81,9], [21,3], [55,5],
+                            [56,7], [54,6], [42,6], [72,8], [44,4], [72,9], [63,9], [36,6], [48,8], [42,7],
+                            [54,6], [30,5], [63,9], [48,6], [24,6], [36,6], [36,4], [77,7], [64,8], [80,8],
+                            [56,7], [32,4], [36,6], [50,5], [54,6], [72,9], [30,2], [63,7], [56,8], [48,12]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '/' }));
+                    }
+                }
+            },
+            "mega-1": {
+                name: "MEGA 1",
+                sumes: {
+                    title: "Sumes MEGA 1 (13, 15, 17, 19)",
+                    desc: "Sumes ràpides partint de nombres senars de dues xifres.",
+                    generate: () => {
+                        const operands = [
+                            [13,9], [13,7], [13,5], [13,3], [13,8], [13,6], [13,4], [13,2], [13,9], [13,6],
+                            [13,7], [13,5], [13,8], [13,4], [13,0], [15,6], [15,9], [15,7], [15,3], [15,6],
+                            [15,8], [15,7], [15,5], [15,6], [15,3], [15,9], [15,3], [15,5], [15,8], [15,7],
+                            [17,5], [17,3], [17,6], [17,9], [17,2], [17,8], [17,7], [17,3], [17,4], [17,8],
+                            [17,3], [17,6], [17,7], [17,2], [17,9], [19,3], [19,6], [19,5], [19,9], [19,5],
+                            [19,3], [19,5], [19,4], [19,9], [19,6], [19,7], [19,5], [19,4], [19,7], [19,3]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '+' }));
+                    }
+                },
+                restes: {
+                    title: "Restes MEGA 1 (14, 12, 10, 16)",
+                    desc: "Restes de dificultat de secundària sota gran pressió de temps.",
+                    generate: () => {
+                        const operands = [
+                            [14,4], [14,7], [14,6], [14,4], [14,6], [14,9], [14,4], [14,2], [14,6], [14,4],
+                            [14,5], [14,4], [14,2], [14,7], [14,9], [12,6], [12,2], [12,9], [12,4], [12,7],
+                            [12,1], [12,5], [12,2], [12,6], [12,4], [12,6], [12,9], [12,7], [12,2], [12,8],
+                            [10,4], [10,2], [10,6], [10,9], [10,6], [10,8], [10,4], [10,3], [10,6], [10,4],
+                            [10,7], [10,5], [10,8], [10,5], [10,9], [16,9], [16,8], [16,5], [16,8], [16,9],
+                            [16,8], [16,7], [16,2], [16,7], [16,8], [16,5], [16,6], [16,9], [16,7], [16,6]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '-' }));
+                    }
+                },
+                multiplicacions: {
+                    title: "Multiplicació MEGA 1 (Fins a 15x4)",
+                    desc: "Nivell molt exigent de multiplicació barrejada ràpida.",
+                    generate: () => {
+                        const operands = [
+                            [13,2], [12,3], [15,4], [8,5], [11,6], [6,4], [7,7], [6,9], [11,6], [8,6],
+                            [4,9], [11,4], [13,3], [5,4], [15,2], [5,2], [6,8], [8,3], [4,9], [9,6],
+                            [11,2], [12,4], [8,7], [7,8], [10,2], [14,3], [7,6], [6,7], [7,9], [9,5],
+                            [12,3], [14,3], [15,4], [7,4], [8,6], [8,5], [7,9], [15,2], [12,4], [8,9],
+                            [13,2], [6,8], [11,4], [12,5], [6,8], [9,7], [5,9], [9,6], [4,8], [8,6],
+                            [9,6], [12,5], [11,9], [8,3], [15,2], [13,4], [7,5], [6,6], [9,9], [6,5]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: 'x' }));
+                    }
+                },
+                divisions: {
+                    title: "Divisions MEGA 1 (Incloses fraccions de 12)",
+                    desc: "Càlcul súper ràpid de divisors d'una i dues xifres.",
+                    generate: () => {
+                        const operands = [
+                            [16,8], [18,2], [12,4], [24,6], [54,9], [40,5], [42,6], [14,2], [18,6], [32,4],
+                            [72,8], [49,7], [81,9], [28,7], [27,9], [30,6], [42,3], [35,5], [30,6], [36,6],
+                            [70,7], [72,8], [56,8], [32,4], [63,7], [27,9], [60,6], [56,7], [18,6], [44,4],
+                            [56,8], [54,9], [42,7], [72,8], [33,3], [81,9], [63,7], [25,5], [48,6], [42,6],
+                            [32,8], [20,5], [54,9], [48,6], [24,4], [18,3], [36,9], [66,6], [49,7], [90,9],
+                            [56,8], [32,8], [35,7], [40,4], [63,7], [72,8], [40,2], [63,9], [56,7], [24,12]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '/' }));
+                    }
+                }
+            },
+            "mega-2": {
+                name: "MEGA 2",
+                sumes: {
+                    title: "Sumes MEGA 2 (Patrons de segona desena)",
+                    desc: "Suma de nombres fins a 18 en format sistemàtic d'alta velocitat.",
+                    generate: () => {
+                        const operands = [
+                            [12,8], [12,6], [12,7], [12,4], [12,9], [12,8], [12,1], [12,7], [12,6], [12,8],
+                            [12,5], [12,0], [12,3], [12,7], [12,8], [14,7], [14,8], [14,6], [14,2], [14,5],
+                            [14,7], [14,6], [14,4], [14,5], [14,2], [14,8], [14,2], [14,6], [14,7], [14,6],
+                            [13,4], [13,7], [13,8], [13,3], [13,9], [13,8], [13,6], [13,4], [13,6], [13,5],
+                            [13,4], [13,7], [13,8], [13,3], [13,4], [18,4], [18,7], [18,6], [18,8], [18,6],
+                            [18,4], [18,7], [18,5], [18,8], [18,7], [18,9], [18,6], [18,5], [18,8], [18,4]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '+' }));
+                    }
+                },
+                restes: {
+                    title: "Restes MEGA 2 (11, 15, 17, 19)",
+                    desc: "Restes ràpides de valors molt elevats per a càlcul àgil.",
+                    generate: () => {
+                        const operands = [
+                            [11,3], [11,6], [11,5], [11,3], [11,5], [11,8], [11,3], [11,1], [11,5], [11,3],
+                            [11,4], [11,3], [11,1], [11,6], [11,7], [15,5], [15,1], [15,8], [15,5], [15,8],
+                            [15,2], [15,6], [15,3], [15,7], [15,5], [15,7], [15,0], [15,9], [15,3], [15,9],
+                            [17,5], [17,3], [17,7], [17,0], [17,7], [17,9], [17,5], [17,4], [17,7], [17,5],
+                            [17,8], [17,6], [17,9], [17,6], [17,1], [19,8], [19,7], [19,4], [19,7], [19,8],
+                            [19,7], [19,6], [19,1], [19,6], [19,7], [19,4], [19,5], [19,8], [19,6], [19,5]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '-' }));
+                    }
+                },
+                multiplicacions: {
+                    title: "Multiplicació MEGA 2 (Taules del 7, 8, 11 i 12)",
+                    desc: "Enfasi exclusiu en les taules complexes de 7, 8, 11 i 12 fins a multiplicar per 12 de cap.",
+                    generate: () => {
+                        const operands = [
+                            [7,2], [7,10], [7,4], [7,5], [7,6], [7,8], [7,7], [7,9], [7,6], [7,11],
+                            [7,9], [7,4], [7,12], [7,8], [7,11], [11,2], [11,8], [11,3], [11,9], [11,6],
+                            [11,11], [11,4], [11,7], [11,8], [11,2], [11,3], [11,6], [11,12], [11,9], [11,5],
+                            [8,3], [8,12], [8,7], [8,11], [8,6], [8,5], [8,9], [8,12], [8,4], [8,9],
+                            [8,2], [8,8], [8,11], [8,5], [8,7], [12,7], [12,9], [12,6], [12,8], [12,6],
+                            [12,6], [12,5], [12,9], [12,3], [12,2], [12,4], [12,5], [12,6], [12,9], [12,5]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: 'x' }));
+                    }
+                },
+                divisions: {
+                    title: "Divisions MEGA 2 (Fins a divisors d'11)",
+                    desc: "La prova reina de divisions clàssiques de El Quinzet.",
+                    generate: () => {
+                        const operands = [
+                            [81,9], [72,8], [18,2], [27,9], [54,9], [36,9], [81,9], [18,9], [27,9], [54,6],
+                            [81,9], [27,3], [18,9], [72,9], [63,9], [14,7], [70,7], [28,4], [35,7], [42,7],
+                            [56,7], [49,7], [63,7], [42,6], [77,7], [63,9], [28,7], [84,7], [56,7], [42,6],
+                            [24,8], [16,2], [56,8], [32,8], [48,4], [40,8], [72,8], [24,3], [48,8], [32,4],
+                            [16,8], [64,8], [56,8], [40,5], [48,8], [22,11], [88,11], [33,11], [99,11], [66,11],
+                            [55,11], [44,11], [77,11], [88,11], [55,11], [33,11], [66,11], [99,11], [33,11], [22,11]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '/' }));
+                    }
+                }
+            },
+            "mega-3": {
+                name: "MEGA 3",
+                sumes: {
+                    title: "Sumes MEGA 3 (Grans addicions ràpides)",
+                    desc: "Sumes amb operands més grans com 14, 12, 16 i 11.",
+                    generate: () => {
+                        const operands = [
+                            [6,14], [7,14], [5,14], [2,14], [8,14], [2,14], [5,14], [4,14], [6,14], [3,14],
+                            [7,14], [9,14], [8,14], [7,14], [6,14], [3,12], [5,12], [1,12], [7,12], [9,12],
+                            [2,12], [8,12], [4,12], [6,12], [5,12], [8,12], [3,12], [9,12], [4,12], [2,12],
+                            [2,16], [4,16], [6,16], [8,16], [9,16], [7,16], [5,16], [3,16], [1,16], [9,16],
+                            [8,16], [5,16], [4,16], [6,16], [7,16], [6,11], [7,11], [8,11], [9,11], [7,11],
+                            [3,11], [6,11], [4,11], [5,11], [2,11], [8,11], [2,11], [5,11], [7,11], [6,11]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '+' }));
+                    }
+                },
+                restes: {
+                    title: "Restes MEGA 3 (Minuends sobre 20)",
+                    desc: "Restes complexes on partim de nombres de la tercera desena (21, 23, 20, 22).",
+                    generate: () => {
+                        const operands = [
+                            [21,3], [21,6], [21,5], [21,3], [21,5], [21,8], [21,3], [21,1], [21,5], [21,3],
+                            [21,4], [21,3], [21,1], [21,6], [21,7], [23,5], [23,1], [23,8], [23,5], [23,8],
+                            [23,2], [23,6], [23,3], [23,7], [23,5], [23,7], [23,0], [23,9], [23,3], [23,9],
+                            [20,5], [20,3], [20,7], [20,0], [20,7], [20,9], [20,5], [20,4], [20,7], [20,5],
+                            [20,8], [20,6], [20,9], [20,6], [20,1], [22,8], [22,7], [22,4], [22,7], [22,8],
+                            [22,7], [22,6], [22,1], [22,6], [22,7], [22,4], [22,5], [22,8], [22,6], [22,5]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '-' }));
+                    }
+                },
+                multiplicacions: {
+                    title: "Multiplicació MEGA 3 (Velocitat extrema)",
+                    desc: "Multiplicacions extremadament exigents de la darrera sèrie del document.",
+                    generate: () => {
+                        const operands = [
+                            [9,3], [8,9], [7,4], [9,7], [8,6], [7,9], [9,7], [8,5], [7,6], [9,8],
+                            [8,9], [6,4], [9,6], [8,8], [6,7], [7,6], [6,8], [4,9], [7,7], [6,6],
+                            [4,4], [7,7], [6,8], [5,9], [7,5], [6,7], [5,8], [7,4], [6,9], [5,6],
+                            [8,2], [7,4], [8,6], [7,8], [8,1], [7,3], [8,5], [7,7], [8,9], [7,9],
+                            [8,5], [7,8], [8,9], [7,6], [8,7], [9,7], [6,9], [9,6], [6,8], [9,6],
+                            [6,6], [9,5], [6,9], [9,3], [5,2], [9,4], [6,5], [9,6], [6,9], [9,5]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: 'x' }));
+                    }
+                },
+                divisions: {
+                    title: "Divisions MEGA 3 (Velocitat de càlcul de divisió ràpida)",
+                    desc: "Gran combinació de divisions exactes on es requereix una ràpida reacció inversa.",
+                    generate: () => {
+                        const operands = [
+                            [42,7], [48,6], [36,4], [49,7], [36,6], [16,4], [49,7], [48,6], [45,5], [35,7],
+                            [42,6], [40,5], [28,7], [54,6], [30,5], [63,7], [54,9], [54,6], [48,8], [54,6],
+                            [36,6], [45,5], [54,9], [27,3], [10,2], [36,4], [30,5], [54,6], [54,9], [45,5],
+                            [16,8], [28,7], [48,8], [56,7], [81,8], [21,7], [40,8], [49,7], [72,8], [63,7],
+                            [40,8], [56,7], [72,8], [42,7], [56,8], [18,9], [72,8], [28,7], [63,9], [48,8],
+                            [63,7], [63,9], [40,8], [42,7], [72,9], [72,8], [24,7], [54,9], [64,8], [42,7]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '/' }));
+                    }
+                }
+            },
+            "mega-4": {
+                name: "MEGA 4 (Secundària / Avançat)",
+                sumes: {
+                    title: "Sumes MEGA 4 (Grans sumes combinades)",
+                    desc: "Suma ràpida on afegim 9, 6, 3, 5, 8 a nombres grans (18, 16, 8, 9).",
+                    generate: () => {
+                        const operands = [
+                            [18,9], [18,7], [18,5], [18,3], [18,8], [18,6], [18,4], [18,2], [18,9], [18,6],
+                            [18,7], [18,5], [18,8], [18,4], [18,0], [16,6], [16,9], [16,7], [16,3], [16,6],
+                            [16,8], [16,7], [16,5], [16,6], [16,3], [16,9], [16,3], [16,5], [16,8], [16,7],
+                            [8,5], [8,3], [8,6], [8,9], [8,2], [8,8], [8,7], [8,3], [8,4], [8,8],
+                            [8,3], [8,6], [8,7], [8,2], [8,9], [9,3], [9,6], [9,5], [9,9], [9,5],
+                            [9,3], [9,5], [9,4], [9,9], [9,6], [9,7], [9,5], [9,4], [9,7], [9,3]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '+' }));
+                    }
+                },
+                restes: {
+                    title: "Restes MEGA 4 (Càlcul sota màxima pressió)",
+                    desc: "Restes ràpides creuant la segona i tercera desena (ex: 24-9, 24-7).",
+                    generate: () => {
+                        const operands = [
+                            [24,4], [24,7], [24,5], [24,9], [24,6], [24,9], [24,7], [24,2], [24,6], [24,8],
+                            [24,5], [24,4], [24,2], [24,7], [24,9], [15,6], [15,2], [15,9], [15,4], [15,7],
+                            [15,1], [15,5], [15,2], [15,6], [15,4], [15,6], [15,9], [15,7], [15,2], [15,8],
+                            [20,4], [20,2], [20,6], [20,9], [20,6], [20,8], [20,4], [20,3], [20,6], [20,4],
+                            [20,7], [20,5], [20,8], [20,5], [20,9], [24,9], [24,8], [24,5], [24,8], [24,9],
+                            [24,8], [24,7], [24,2], [24,7], [24,8], [24,5], [24,6], [24,9], [24,7], [24,6]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '-' }));
+                    }
+                },
+                multiplicacions: {
+                    title: "Multiplicació MEGA 4 (Dígits múltiples, ex: 25x2, 12x5)",
+                    desc: "El cim del càlcul mental multiplicatiu de El Quinzet. Multiplica fins a 25 mentalment.",
+                    generate: () => {
+                        const operands = [
+                            [11,3], [12,2], [15,3], [8,7], [11,5], [6,8], [7,10], [7,11], [12,4], [4,8],
+                            [6,9], [11,4], [25,2], [7,9], [2,15], [15,3], [7,8], [8,9], [4,8], [9,6],
+                            [11,3], [12,5], [8,7], [9,8], [9,10], [14,2], [2,13], [7,6], [6,7], [6,9],
+                            [9,4], [3,11], [4,15], [2,25], [7,6], [8,9], [11,9], [2,15], [4,12], [7,9],
+                            [2,12], [4,8], [11,6], [5,12], [2,30], [7,9], [5,8], [7,6], [8,4], [2,14],
+                            [9,6], [5,11], [10,9], [8,3], [2,15], [10,4], [5,7], [2,20], [8,8], [7,9]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: 'x' }));
+                    }
+                },
+                divisions: {
+                    title: "Divisions MEGA 4 (Divisors fins a 30 i 25)",
+                    desc: "La prova més difícil. Divisions exactes dividint entre 11, 12, 13, 14, 15, 20, 25 i 30.",
+                    generate: () => {
+                        const operands = [
+                            [36,9], [33,11], [60,15], [50,25], [42,7], [72,9], [99,11], [30,15], [48,12], [63,7],
+                            [24,12], [32,4], [66,11], [60,12], [60,30], [63,7], [40,8], [42,6], [32,8], [28,14],
+                            [54,6], [55,11], [90,10], [24,3], [30,15], [40,10], [35,7], [40,20], [64,8], [63,7],
+                            [36,6], [36,4], [77,7], [64,8], [80,8], [56,7], [32,4], [36,6], [50,5], [54,6],
+                            [72,9], [30,2], [63,7], [56,8], [48,12], [45,15], [56,8], [72,9], [32,4], [54,6],
+                            [33,11], [60,12], [56,7], [72,8], [90,10], [28,14], [26,13], [42,6], [42,7], [54,6]
+                        ];
+                        return operands.map(o => ({ num1: o[0], num2: o[1], op: '/' }));
+                    }
+                }
+            }
+        };
+
+        // ESTAT GLOBAL DE L'APLICACIÓ
+        let selectedCourse = "primer";
+        let selectedOperation = "sumes";
+        let questions = [];
+        let timerInterval = null;
+        let timeLeft = 120; // 2 minuts
+        let currentFocusedIndex = 0;
+        let results = [];
+
+        // Inicialització en carregar la pàgina
+        window.addEventListener('DOMContentLoaded', () => {
+            renderCourseSelectors();
+            selectCourse("primer");
+            lucide.createIcons();
+        });
+
+        // Generar Selectors de Curs
+        function renderCourseSelectors() {
+            const container = document.getElementById('course-selector');
+            container.innerHTML = '';
+            
+            Object.keys(CONFIG_NIVELLS).forEach(key => {
+                const isSelected = key === selectedCourse;
+                const button = document.createElement('button');
+                button.className = `p-3 text-sm font-bold rounded-xl text-left border transition-all ${
+                    isSelected 
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/10' 
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                }`;
+                button.innerHTML = CONFIG_NIVELLS[key].name;
+                button.onclick = () => selectCourse(key);
+                container.appendChild(button);
+            });
+        }
+
+        // Seleccionar Curs
+        function selectCourse(courseKey) {
+            selectedCourse = courseKey;
+            renderCourseSelectors();
+
+            // Obtenir operacions vàlides per a aquest curs
+            const levelData = CONFIG_NIVELLS[courseKey];
+            const ops = Object.keys(levelData).filter(k => k !== 'name');
+
+            // Ajustar operació seleccionada si no està disponible
+            if (!ops.includes(selectedOperation)) {
+                selectedOperation = ops[0];
+            }
+
+            renderOperationSelectors(ops);
+            updateLevelDetails();
+        }
+
+        // Generar Selectors d'Operació
+        function renderOperationSelectors(availableOps) {
+            const container = document.getElementById('operation-selector');
+            container.innerHTML = '';
+
+            const opNames = {
+                'sumes': { label: 'Sumes', icon: 'plus', color: 'bg-emerald-50 text-emerald-600 border-emerald-200' },
+                'restes': { label: 'Restes', icon: 'minus', color: 'bg-rose-50 text-rose-600 border-rose-200' },
+                'multiplicacions': { label: 'Multiplicacions', icon: 'x', color: 'bg-amber-50 text-amber-600 border-amber-200' },
+                'divisions': { label: 'Divisions', icon: 'divide', color: 'bg-sky-50 text-sky-600 border-sky-200' }
+            };
+
+            availableOps.forEach(op => {
+                const isSelected = op === selectedOperation;
+                const info = opNames[op] || { label: op, icon: 'help-circle', color: 'bg-slate-50 text-slate-600 border-slate-200' };
+                
+                const button = document.createElement('button');
+                button.className = `p-3 text-sm font-bold rounded-xl text-left border flex items-center gap-2 transition-all ${
+                    isSelected 
+                    ? 'bg-slate-900 text-white border-slate-900 shadow-md shadow-slate-900/10' 
+                    : `${info.color} hover:opacity-80`
+                }`;
+                button.innerHTML = `
+                    <i data-lucide="${info.icon}" class="w-4 h-4"></i>
+                    <span>${info.label}</span>
+                `;
+                button.onclick = () => selectOperation(op);
+                container.appendChild(button);
+            });
+            lucide.createIcons();
+        }
+
+        // Seleccionar Operació
+        function selectOperation(opKey) {
+            selectedOperation = opKey;
+            // Actualitzar de nou per visualitzar canvis
+            selectCourse(selectedCourse);
+        }
+
+        // Actualitzar detalls informatius del nivell
+        function updateLevelDetails() {
+            const levelData = CONFIG_NIVELLS[selectedCourse][selectedOperation];
+            if (levelData) {
+                document.getElementById('selected-level-title').innerText = `${CONFIG_NIVELLS[selectedCourse].name} — ${selectedOperation.charAt(0).toUpperCase() + selectedOperation.slice(1)}`;
+                document.getElementById('selected-level-desc').innerText = levelData.desc;
+            }
+        }
+
+        // COMENÇAR LA PROVA
+        function startTest() {
+            // Mostrar dades d'estat de la prova
+            const opLabel = selectedOperation === 'sumes' ? 'Sumes' : selectedOperation === 'restes' ? 'Restes' : selectedOperation === 'multiplicacions' ? 'Multiplicacions' : 'Divisions';
+            document.getElementById('current-series-display').innerText = `${CONFIG_NIVELLS[selectedCourse].name} (${opLabel})`;
+
+            // Generar 60 preguntes
+            const levelData = CONFIG_NIVELLS[selectedCourse][selectedOperation];
+            questions = levelData.generate();
+
+            // Netejar i muntar graella
+            buildGrid();
+
+            // Canviar pantalles
+            document.getElementById('config-screen').classList.add('hidden');
+            document.getElementById('test-screen').classList.remove('hidden');
+            document.getElementById('test-screen').classList.add('flex');
+
+            // Iniciar temporitzador
+            timeLeft = 120;
+            updateTimerDisplay();
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    finishTest();
+                }
+            }, 1000);
+
+            // Enfocar la primera cel·la
+            setTimeout(() => {
+                currentFocusedIndex = 0;
+                focusInput(0);
+            }, 300);
+        }
+
+        // Actualitzar l'aspecte i format del temporitzador
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            const displayStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            const displayElement = document.getElementById('timer-display');
+            displayElement.innerText = displayStr;
+
+            // Alerta visual de darrers segons (vermell i batec)
+            if (timeLeft <= 15) {
+                displayElement.className = "text-2xl font-black font-mono tracking-wider text-red-500 animate-pulse";
+            } else {
+                displayElement.className = "text-2xl font-black font-mono tracking-wider text-amber-300";
+            }
+        }
+
+        // MUNTAR LA GRAELLA DE 4 COLUMNS X 15 FILLES (60 preguntes en total)
+        function buildGrid() {
+            for (let colIndex = 0; colIndex < 4; colIndex++) {
+                const colContainer = document.getElementById(`col-${colIndex}`);
+                colContainer.innerHTML = '';
+
+                for (let row = 0; row < 15; row++) {
+                    const index = colIndex * 15 + row;
+                    const q = questions[index];
+                    
+                    // Format d'operació
+                    let opSymbol = q.op;
+                    if (opSymbol === '/') opSymbol = ':';
+                    if (opSymbol === 'x') opSymbol = 'x';
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = "flex items-center justify-between bg-slate-50 border border-slate-200 p-2.5 rounded-xl gap-2 hover:border-blue-200 transition-colors";
+                    itemDiv.id = `item-container-${index}`;
+                    
+                    itemDiv.innerHTML = `
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-black text-slate-400 w-5 text-right font-mono">${index + 1}.</span>
+                            <span class="text-base font-bold text-slate-700 font-mono">${q.num1} ${opSymbol} ${q.num2} =</span>
+                        </div>
+                        <input type="number" 
+                               id="input-${index}" 
+                               onfocus="setFocusedIndex(${index})"
+                               onkeydown="handleKeydown(event, ${index})"
+                               class="w-16 text-center text-lg font-bold bg-white border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-blue-700 py-1 rounded-lg font-mono">
+                    `;
+                    colContainer.appendChild(itemDiv);
+                }
+            }
+        }
+
+        // Gestió de dades i interaccions de l'usuari a la cel·la
+        function setFocusedIndex(index) {
+            currentFocusedIndex = index;
+            // Destacar lleugerament la targeta activa
+            document.querySelectorAll('[id^="item-container-"]').forEach(el => {
+                el.classList.remove('border-blue-400', 'bg-blue-50/20');
+            });
+            const activeCard = document.getElementById(`item-container-${index}`);
+            if (activeCard) {
+                activeCard.classList.add('border-blue-400', 'bg-blue-50/20');
+            }
+        }
+
+        function focusInput(index) {
+            const input = document.getElementById(`input-${index}`);
+            if (input) {
+                input.focus();
+                input.select();
+            }
+        }
+
+        // Permetre tecles com fletxes, Retorn o Espai per saltar
+        function handleKeydown(e, index) {
+            if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (index < 59) focusInput(index + 1);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (index > 0) focusInput(index - 1);
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                // Passar a la mateixa fila de la següent columna
+                if (index + 15 < 60) focusInput(index + 15);
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                // Tornar a la mateixa fila de la columna anterior
+                if (index - 15 >= 0) focusInput(index - 15);
+            }
+        }
+
+        // TECLAT NUMÈRIC VIRTUAL EN PANTALLA MÒBIL
+        function pressKey(val) {
+            const activeInput = document.getElementById(`input-${currentFocusedIndex}`);
+            if (!activeInput) return;
+
+            if (val === 'clear') {
+                activeInput.value = '';
+            } else if (val === 'next') {
+                if (currentFocusedIndex < 59) focusInput(currentFocusedIndex + 1);
+            } else {
+                activeInput.value += val;
+            }
+            activeInput.focus();
+        }
+
+        // CONFIRMACIÓ DE SORTIDA
+        function confirmExit() {
+            showModal("Atenció", "Segur que vols abandonar la prova? No es desaran els resultats.", [
+                { text: "Continuar Prova", style: "bg-slate-100 text-slate-700", action: closeModal },
+                { text: "Sí, Sortir", style: "bg-red-600 text-white", action: () => {
+                    closeModal();
+                    goToConfig();
+                }}
+            ]);
+        }
+
+        // ACABAR LA PROVA I CALCULAR ENCERTS
+        function finishTest() {
+            clearInterval(timerInterval);
+            
+            let correctCount = 0;
+            let answeredCount = 0;
+            let errorCount = 0;
+            results = [];
+
+            questions.forEach((q, idx) => {
+                const inputVal = document.getElementById(`input-${idx}`).value.trim();
+                let isCorrect = false;
+                let answer = null;
+
+                if (inputVal !== '') {
+                    answeredCount++;
+                    const userNum = parseInt(inputVal, 10);
+                    let expectedNum = 0;
+                    
+                    if (q.op === '+') expectedNum = q.num1 + q.num2;
+                    else if (q.op === '-') expectedNum = q.num1 - q.num2;
+                    else if (q.op === 'x') expectedNum = q.num1 * q.num2;
+                    else if (q.op === '/') expectedNum = q.num1 / q.num2;
+
+                    if (userNum === expectedNum) {
+                        isCorrect = true;
+                        correctCount++;
+                    } else {
+                        errorCount++;
+                    }
+                    answer = userNum;
+                }
+
+                results.push({
+                    question: q,
+                    userAnswer: answer,
+                    isCorrect: isCorrect
+                });
+            });
+
+            // Guardar intent a l'historial del dispositiu
+            saveAttempt(correctCount, answeredCount, errorCount);
+
+            // Mostrar resultats en pantalla
+            displayResults(correctCount, answeredCount, errorCount);
+        }
+
+        // DESAR INTENT AL LOCALSTORAGE (MANTENINT L'HISTORIAL SENSE REQUERIR EL NOM)
+        function saveAttempt(correct, answered, errors) {
+            const key = `quinzet_${selectedCourse}_${selectedOperation}`;
+            let history = JSON.parse(localStorage.getItem(key)) || [];
+            
+            // Definim de manera automàtica el número d'intent per identificar les sessions de l'historial
+            const sessionNum = history.length + 1;
+            
+            const newAttempt = {
+                student: `Sessió #${sessionNum}`,
+                date: new Date().toLocaleDateString('ca-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }),
+                correct: correct,
+                answered: answered,
+                errors: errors
+            };
+
+            history.unshift(newAttempt); // Afegir al principi
+            // Limitar a un màxim de 10 intents històrics
+            if (history.length > 10) history.pop();
+
+            localStorage.setItem(key, JSON.stringify(history));
+        }
+
+        // MOSTRAR PANTALLA DE RESULTATS AMB ELS DETALLS
+        function displayResults(correct, answered, errors) {
+            document.getElementById('test-screen').classList.remove('flex');
+            document.getElementById('test-screen').classList.add('hidden');
+            
+            document.getElementById('results-screen').classList.remove('hidden');
+            document.getElementById('results-screen').classList.add('grid');
+
+            // Actualitzar camps
+            document.getElementById('score-display').innerText = correct;
+            document.getElementById('total-answered').innerText = answered;
+            document.getElementById('total-errors').innerText = errors;
+
+            // Determinar Consell / Recomanació basat en la regla de El Quinzet actualitzada (pujar de nivell amb >= 50)
+            const recBox = document.getElementById('recommendation-box');
+            let recHTML = '';
+
+            if (correct >= 50) {
+                recHTML = `
+                    <div class="p-3 bg-emerald-500 text-white rounded-xl flex-shrink-0">
+                        <i data-lucide="arrow-up-circle" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm">Nivell Superat! (50 o més)</h4>
+                        <p class="text-xs text-slate-600 mt-1">
+                            Increïble! Has automatitzat aquesta sèrie. El Quinzet et recomana provar amb el <strong>nivell superior</strong> d'aquesta operació per continuar millorant.
+                        </p>
+                    </div>
+                `;
+                recBox.className = "p-4 rounded-xl mb-6 flex gap-3 items-start bg-emerald-50 border border-emerald-200";
+            } else if (correct < 15) {
+                recHTML = `
+                    <div class="p-3 bg-rose-500 text-white rounded-xl flex-shrink-0">
+                        <i data-lucide="arrow-down-circle" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm">Recomanació: Canvia de Nivell (Menys de 15)</h4>
+                        <p class="text-xs text-slate-600 mt-1">
+                            No et preocupis! És important consolidar la base. Et recomanem fer la mateixa prova en el <strong>nivell o curs inferior</strong> per anar agafant seguretat i agilitat.
+                        </p>
+                    </div>
+                `;
+                recBox.className = "p-4 rounded-xl mb-6 flex gap-3 items-start bg-rose-50 border border-rose-200";
+            } else {
+                recHTML = `
+                    <div class="p-3 bg-blue-500 text-white rounded-xl flex-shrink-0">
+                        <i data-lucide="award" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm">Bon Progrés! (Entre 15 i 49 encerts)</h4>
+                        <p class="text-xs text-slate-600 mt-1">
+                            Estàs en el camí correcte. Repeteix aquesta mateixa prova regularment per intentar superar el teu rècord i arribar a la fita de les <strong>50 correctes</strong> per poder pujar.
+                        </p>
+                    </div>
+                `;
+                recBox.className = "p-4 rounded-xl mb-6 flex gap-3 items-start bg-blue-50 border border-blue-200";
+            }
+            recBox.innerHTML = recHTML;
+
+            // Llegir Rècord anterior (excloent l'intent d'ara mateix)
+            const key = `quinzet_${selectedCourse}_${selectedOperation}`;
+            const history = JSON.parse(localStorage.getItem(key)) || [];
+            
+            const recordDisplay = document.getElementById('last-record-display');
+            if (history.length > 1) {
+                // El rècord de l'última vegada és el millor dels intents previs
+                const previousAttempts = history.slice(1);
+                const best = Math.max(...previousAttempts.map(a => a.correct));
+                recordDisplay.innerHTML = `L'últim millor resultat d'aquesta sèrie va ser de <strong>${best} correctes</strong>.`;
+            } else {
+                recordDisplay.innerHTML = `Aquest ha estat el primer intent registrat en aquesta sèrie!`;
+            }
+
+            // Actualitzar llista d'historial
+            renderHistoryList(history);
+            lucide.createIcons();
+        }
+
+        // Generar Historial visual a la targeta
+        function renderHistoryList(history) {
+            const listContainer = document.getElementById('history-list');
+            listContainer.innerHTML = '';
+
+            if (history.length === 0) {
+                listContainer.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hi ha intents registrats encara.</p>';
+                return;
+            }
+
+            history.forEach((h, index) => {
+                const item = document.createElement('div');
+                item.className = `flex justify-between items-center p-2.5 rounded-xl border text-xs ${index === 0 ? 'bg-blue-50/40 border-blue-200' : 'bg-slate-50 border-slate-200'}`;
+                item.innerHTML = `
+                    <div>
+                        <span class="font-bold text-slate-700">${h.student}</span>
+                        <span class="text-[10px] text-slate-400 block">${h.date}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 font-bold font-mono">
+                        <span class="text-emerald-600 text-sm">${h.correct} encerts</span>
+                        <span class="text-slate-300">|</span>
+                        <span class="text-slate-400">${h.answered} respostes</span>
+                    </div>
+                `;
+                listContainer.appendChild(item);
+            });
+        }
+
+        // Netejar l'historial del dispositiu pel nivell seleccionat
+        function clearCurrentHistory() {
+            showModal("Atenció", "Estàs a punt d'esborrar tot l'historial de dades d'aquest nivell concret. Aquesta acció és irreversible.", [
+                { text: "Cancel·lar", style: "bg-slate-100 text-slate-700", action: closeModal },
+                { text: "Esborrar-ho tot", style: "bg-red-600 text-white", action: () => {
+                    const key = `quinzet_${selectedCourse}_${selectedOperation}`;
+                    localStorage.removeItem(key);
+                    renderHistoryList([]);
+                    document.getElementById('last-record-display').innerText = "Historial netejat amb èxit.";
+                    closeModal();
+                }}
+            ]);
+        }
+
+        // REINICIAR TEST SENSE PASSAR PER CONFIGURACIÓ
+        function restartTest() {
+            document.getElementById('results-screen').classList.remove('grid');
+            document.getElementById('results-screen').classList.add('hidden');
+            startTest();
+        }
+
+        // ANAR AL MENÚ PRINCIPAL
+        function goToConfig() {
+            document.getElementById('results-screen').classList.remove('grid');
+            document.getElementById('results-screen').classList.add('hidden');
+            document.getElementById('test-screen').classList.remove('flex');
+            document.getElementById('test-screen').classList.add('hidden');
+            document.getElementById('config-screen').classList.remove('hidden');
+            
+            // Actualitzar paràmetres visuals i de curs
+            selectCourse(selectedCourse);
+        }
+
+        // CONTROL DE MODALS PERSONALITZATS
+        function showModal(title, bodyText, actions) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-body').innerText = bodyText;
+            
+            const actionsContainer = document.getElementById('modal-actions');
+            actionsContainer.innerHTML = '';
+
+            actions.forEach(act => {
+                const btn = document.createElement('button');
+                btn.className = `px-4 py-2.5 rounded-xl text-xs font-bold transition-transform active:scale-95 ${act.style}`;
+                btn.innerText = act.text;
+                btn.onclick = act.action;
+                actionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('custom-modal').classList.remove('hidden');
+            document.getElementById('custom-modal').classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.remove('flex');
+            document.getElementById('custom-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
