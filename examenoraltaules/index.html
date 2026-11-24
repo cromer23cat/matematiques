@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pràctica de les Taules de Multiplicar</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tone.js per efectes de so subtils sense arxius externs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between antialiased selection:bg-indigo-100 selection:text-indigo-700">
+
+    <!-- Capçalera amb el selector de nivell i el comptador de rondes -->
+    <header class="w-full max-w-3xl mx-auto pt-6 px-4 sm:px-6">
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            
+            <!-- Selector de Nivells -->
+            <div class="flex flex-col items-center sm:items-start w-full sm:w-auto">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Nivell de dificultat</span>
+                <div class="inline-flex bg-slate-100 p-1.5 rounded-2xl w-full sm:w-auto" role="group" aria-label="Selector de nivell">
+                    <button 
+                        id="btn-level-1" 
+                        type="button"
+                        onclick="setLevel(1)"
+                        class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-white text-indigo-600 shadow-sm"
+                    >
+                        Taules 1 - 9
+                    </button>
+                    <button 
+                        id="btn-level-2" 
+                        type="button"
+                        onclick="setLevel(2)"
+                        class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-slate-600 hover:text-slate-900"
+                    >
+                        Taules 11 - 15
+                    </button>
+                </div>
+            </div>
+
+            <!-- Comptador de Rondes amb botons + i - -->
+            <div class="flex flex-col items-center sm:items-end w-full sm:w-auto">
+                <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Comptador de rondes</span>
+                <div class="inline-flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200/60">
+                    <button 
+                        id="btn-round-minus" 
+                        type="button"
+                        onclick="changeRound(-1)"
+                        aria-label="Restar una ronda"
+                        class="w-10 h-10 rounded-xl bg-white text-slate-700 font-bold text-xl flex items-center justify-center shadow-sm hover:bg-slate-50 active:scale-95 transition-all disabled:opacity-40 disabled:pointer-events-none"
+                    >
+                        −
+                    </button>
+                    <div class="px-5 flex flex-col items-center justify-center min-w-[4.5rem]">
+                        <span id="round-display" class="text-xl font-extrabold text-slate-800 leading-none">0</span>
+                        <span class="text-[10px] font-medium text-slate-400 uppercase mt-0.5">Ronda</span>
+                    </div>
+                    <button 
+                        id="btn-round-plus" 
+                        type="button"
+                        onclick="changeRound(1)"
+                        aria-label="Sumar una ronda"
+                        class="w-10 h-10 rounded-xl bg-white text-indigo-600 font-bold text-xl flex items-center justify-center shadow-sm hover:bg-indigo-50 active:scale-95 transition-all"
+                    >
+                        +
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- Àrea principal de competició -->
+    <main class="w-full max-w-3xl mx-auto px-4 sm:px-6 my-auto py-6">
+        <div class="bg-white rounded-3xl shadow-lg shadow-slate-200/50 border border-slate-200/80 p-8 sm:p-14 text-center">
+            
+            <!-- Etiqueta informativa del nivell actual -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-700 text-sm font-semibold mb-8 transition-colors duration-200" id="badge-container">
+                <span class="w-2.5 h-2.5 rounded-full bg-indigo-500" id="badge-dot"></span>
+                <span id="level-badge">Nivell 1: Taules de l'1 al 9</span>
+            </div>
+
+            <!-- Operació matemàtica gran per projectar a classe -->
+            <div class="my-6 sm:my-10" aria-live="polite">
+                <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-6xl sm:text-8xl font-extrabold tracking-tight text-slate-800 select-none">
+                    <span id="num-a" class="bg-slate-50 border-2 border-slate-200/80 rounded-3xl px-6 py-4 sm:px-9 sm:py-6 min-w-[6.5rem] sm:min-w-[9rem] shadow-sm">7</span>
+                    <span class="text-indigo-500">×</span>
+                    <span id="num-b" class="bg-slate-50 border-2 border-slate-200/80 rounded-3xl px-6 py-4 sm:px-9 sm:py-6 min-w-[6.5rem] sm:min-w-[9rem] shadow-sm">8</span>
+                    <span class="text-slate-300">=</span>
+                    <span id="result-box" class="bg-indigo-50/70 border-2 border-dashed border-indigo-300 text-indigo-600 rounded-3xl px-6 py-4 sm:px-9 sm:py-6 min-w-[6.5rem] sm:min-w-[9rem] transition-all duration-200">?</span>
+                </div>
+            </div>
+
+            <!-- Botons principals per a la competició a classe -->
+            <div class="mt-10 max-w-md mx-auto flex flex-col sm:flex-row gap-4">
+                <button 
+                    type="button"
+                    id="btn-reveal"
+                    onclick="revealAnswer()"
+                    class="flex-1 py-4 px-6 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-lg shadow-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                >
+                    <span>Veure resultat</span>
+                </button>
+                <button 
+                    type="button"
+                    id="btn-next"
+                    onclick="nextQuestion()"
+                    class="flex-1 py-4 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg shadow-lg shadow-indigo-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                >
+                    <span>Següent</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Barra inferior amb dreceres de teclat i control de so -->
+            <div class="mt-10 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
+                <span>Prem <kbd class="px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-slate-500 font-sans">Espai</kbd> per veure el resultat i <kbd class="px-1.5 py-0.5 bg-slate-50 border border-slate-200 rounded text-slate-500 font-sans">Enter</kbd> per passar a la següent</span>
+                <button 
+                    type="button" 
+                    onclick="toggleSound()" 
+                    id="btn-sound"
+                    class="hover:text-slate-700 font-medium transition-colors py-1 px-2 rounded-lg shrink-0"
+                    title="Activar o desactivar so"
+                >
+                    🔊 So: Sí
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Estat global de l'aplicació
+        const state = {
+            level: 1,           // 1: taules 1-9 | 2: taules 11-15
+            round: 0,           // Comptador de rondes (comença a 0)
+            numA: 1,            // Primer factor (la taula)
+            numB: 1,            // Segon factor (multiplicador)
+            lastPair: '',       // Per evitar repetir exactament la mateixa operació seguida
+            revealed: false,    // Indica si el resultat s'està mostrant
+            soundEnabled: true  // Estat del so
+        };
+
+        // Sintetitzador de so senzill amb Tone.js
+        let synth = null;
+        function playTone(type) {
+            if (!state.soundEnabled || typeof Tone === 'undefined') return;
+            try {
+                if (Tone.context.state !== 'running') {
+                    Tone.start();
+                }
+                if (!synth) {
+                    synth = new Tone.Synth({
+                        oscillator: { type: 'sine' },
+                        envelope: { attack: 0.01, decay: 0.12, sustain: 0, release: 0.1 }
+                    }).toDestination();
+                }
+                if (type === 'correct') {
+                    synth.triggerAttackRelease('G5', '16n');
+                } else if (type === 'click') {
+                    synth.triggerAttackRelease('C5', '32n');
+                }
+            } catch (e) {
+                // Ignorar errors d'àudio si el navegador bloqueja l'autoplay
+            }
+        }
+
+        // Activar o desactivar el so
+        function toggleSound() {
+            state.soundEnabled = !state.soundEnabled;
+            const btn = document.getElementById('btn-sound');
+            btn.textContent = state.soundEnabled ? '🔊 So: Sí' : '🔇 So: No';
+        }
+
+        // Canviar entre Nivell 1 (1-9) i Nivell 2 (11-15)
+        function setLevel(newLevel) {
+            if (state.level === newLevel) return;
+            state.level = newLevel;
+            playTone('click');
+
+            const btn1 = document.getElementById('btn-level-1');
+            const btn2 = document.getElementById('btn-level-2');
+
+            if (newLevel === 1) {
+                btn1.className = 'flex-1 sm:flex-none px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-white text-indigo-600 shadow-sm';
+                btn2.className = 'flex-1 sm:flex-none px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-slate-600 hover:text-slate-900';
+            } else {
+                btn2.className = 'flex-1 sm:flex-none px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 bg-white text-indigo-600 shadow-sm';
+                btn1.className = 'flex-1 sm:flex-none px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 text-slate-600 hover:text-slate-900';
+            }
+
+            updateRoundUI();
+            generateQuestion();
+        }
+
+        // Actualitzar el comptador de rondes (+1 o -1, mínim 0)
+        function changeRound(delta) {
+            const nextRound = Math.max(0, state.round + delta);
+            if (nextRound !== state.round) {
+                state.round = nextRound;
+                playTone('click');
+                updateRoundUI();
+                generateQuestion();
+            }
+        }
+
+        // Actualitzar comptador visual i etiqueta de dificultat segons la ronda
+        function updateRoundUI() {
+            document.getElementById('round-display').textContent = state.round;
+            document.getElementById('btn-round-minus').disabled = state.round <= 0;
+
+            const badge = document.getElementById('level-badge');
+            const badgeContainer = document.getElementById('badge-container');
+            const badgeDot = document.getElementById('badge-dot');
+
+            if (state.level === 1) {
+                if (state.round >= 8) {
+                    badge.textContent = "Nivell 1: Taules 1-9 (Dificultat Màxima 🔥)";
+                    badgeContainer.className = "inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-50 text-rose-700 text-sm font-semibold mb-8 transition-colors duration-200";
+                    badgeDot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
+                } else if (state.round >= 5) {
+                    badge.textContent = "Nivell 1: Taules 1-9 (Dificultat Alta ⚡)";
+                    badgeContainer.className = "inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-50 text-amber-700 text-sm font-semibold mb-8 transition-colors duration-200";
+                    badgeDot.className = "w-2.5 h-2.5 rounded-full bg-amber-500";
+                } else {
+                    badge.textContent = "Nivell 1: Taules de l'1 al 9";
+                    badgeContainer.className = "inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-700 text-sm font-semibold mb-8 transition-colors duration-200";
+                    badgeDot.className = "w-2.5 h-2.5 rounded-full bg-indigo-500";
+                }
+            } else {
+                badge.textContent = "Nivell 2: Taules de l'11 al 15";
+                badgeContainer.className = "inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-700 text-sm font-semibold mb-8 transition-colors duration-200";
+                badgeDot.className = "w-2.5 h-2.5 rounded-full bg-indigo-500";
+            }
+        }
+
+        // Generar un nombre enter aleatori entre min i max (inclosos)
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Escull un factor (1-9) segons la ronda actual per escalar la dificultat
+        function pickWeightedFactor(round) {
+            const r = Math.random();
+
+            if (round <= 2) {
+                // Rondes 0-2: 75% fàcils (1-5), 25% altes (6-9)
+                return r < 0.75 ? randomInt(1, 5) : randomInt(6, 9);
+            } else if (round <= 4) {
+                // Rondes 3-4: 45% baixes (1-4), 55% altes (5-9)
+                return r < 0.45 ? randomInt(1, 4) : randomInt(5, 9);
+            } else if (round <= 7) {
+                // Rondes 5-7: 80% números alts (5-9), 20% mitjanes (2-4) - s'elimina l'1
+                return r < 0.80 ? randomInt(5, 9) : randomInt(2, 4);
+            } else {
+                // Ronda 8+: 85% molt alts (6-9), 15% el 5
+                return r < 0.85 ? randomInt(6, 9) : 5;
+            }
+        }
+
+        // Generar una nova multiplicació aleatòria segons el nivell i la ronda
+        function generateQuestion() {
+            let a, b, pairKey;
+            let attempts = 0;
+
+            do {
+                if (state.level === 1) {
+                    // Nivell 1: escala dificultat amb les rondes
+                    a = pickWeightedFactor(state.round);
+                    // A partir de la ronda 5, també pugem el segon factor (5-9 o 10)
+                    if (state.round >= 5) {
+                        b = Math.random() < 0.75 ? randomInt(5, 9) : randomInt(2, 10);
+                    } else {
+                        b = randomInt(1, 10);
+                    }
+                } else {
+                    // Nivell 2: taules de l'11 al 15 (multiplicat per 1..10)
+                    a = randomInt(11, 15);
+                    b = state.round >= 5 ? randomInt(4, 10) : randomInt(1, 10);
+                }
+                pairKey = `${a}x${b}`;
+                attempts++;
+            } while (pairKey === state.lastPair && attempts < 10);
+
+            state.numA = a;
+            state.numB = b;
+            state.lastPair = pairKey;
+            state.revealed = false;
+
+            // Actualitzar la interfície
+            document.getElementById('num-a').textContent = a;
+            document.getElementById('num-b').textContent = b;
+
+            const resultBox = document.getElementById('result-box');
+            resultBox.textContent = '?';
+            resultBox.className = 'bg-indigo-50/70 border-2 border-dashed border-indigo-300 text-indigo-600 rounded-3xl px-6 py-4 sm:px-9 sm:py-6 min-w-[6.5rem] sm:min-w-[9rem] transition-all duration-200';
+
+            // Reactivar botó de veure resultat
+            const btnReveal = document.getElementById('btn-reveal');
+            btnReveal.disabled = false;
+            btnReveal.classList.remove('opacity-50', 'pointer-events-none');
+        }
+
+        // Botó "Següent"
+        function nextQuestion() {
+            playTone('click');
+            generateQuestion();
+        }
+
+        // Mostrar el resultat de l'operació actual
+        function revealAnswer() {
+            if (state.revealed) return;
+            state.revealed = true;
+            
+            const correctAnswer = state.numA * state.numB;
+            const resultBox = document.getElementById('result-box');
+            resultBox.textContent = correctAnswer;
+            resultBox.className = 'bg-emerald-50 border-2 border-emerald-400 text-emerald-700 rounded-3xl px-6 py-4 sm:px-9 sm:py-6 min-w-[6.5rem] sm:min-w-[9rem] shadow-sm transition-all duration-200';
+            
+            const btnReveal = document.getElementById('btn-reveal');
+            btnReveal.disabled = true;
+            btnReveal.classList.add('opacity-50', 'pointer-events-none');
+
+            playTone('correct');
+        }
+
+        // Dreceres de teclat per agilitzar la competició a classe
+        document.addEventListener('keydown', (e) => {
+            if (e.repeat) return;
+
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (!state.revealed) {
+                    revealAnswer();
+                } else {
+                    nextQuestion();
+                }
+            } else if (e.code === 'Enter' || e.code === 'ArrowRight') {
+                e.preventDefault();
+                nextQuestion();
+            }
+        });
+
+        // Inicialitzar l'aplicació en carregar la pàgina
+        window.addEventListener('DOMContentLoaded', () => {
+            updateRoundUI();
+            generateQuestion();
+        });
+    </script>
+</body>
+</html>
