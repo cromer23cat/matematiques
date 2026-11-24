@@ -1,0 +1,1917 @@
+<!doctype html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#20382c">
+
+  <title>Piràmides numèriques · MADUKA</title>
+
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Trebuchet MS", system-ui, sans-serif;
+      color: #20382c;
+      background: #f7f5eb;
+      --ink: #20382c;
+      --muted: #506357;
+      --line: #dce0d0;
+      --paper: #fffdf6;
+      --given: #dce9c6;
+    }
+
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    body { margin: 0; }
+    body.entry-open { overflow: hidden; }
+    button, input, select { font: inherit; }
+    button, summary { cursor: pointer; }
+
+    :focus-visible {
+      outline: 3px solid #8553a5;
+      outline-offset: 3px;
+    }
+
+    .wrap {
+      width: min(1040px, calc(100% - 36px));
+      margin: auto;
+    }
+
+    /* DISTRIBUCIÓ */
+
+    h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(38px, 7vw, 73px);
+      letter-spacing: -.07em;
+      line-height: 1;
+    }
+
+    .intro {
+      margin: 0 0 25px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.8fr) minmax(235px, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .card {
+      min-width: 0;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: var(--paper);
+    }
+
+    .card h2 { margin: 0; font-size: 20px; }
+
+    .board-head, .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .board-head {
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .actions { margin-top: 15px; }
+
+    .score {
+      padding: 6px 10px;
+      border-radius: 20px;
+      background: #e9eddc;
+      font-size: 14px;
+    }
+
+    /* BOTONS I CAMPS */
+
+    .primary, .mode {
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 800;
+    }
+
+    .primary {
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: white;
+    }
+
+    .mode {
+      border: 1px solid #aab9a2;
+      background: var(--paper);
+      color: var(--ink);
+      text-align: left;
+    }
+
+    .mode[aria-pressed="true"] {
+      border-color: #758e69;
+      background: #e3edd0;
+    }
+
+    button:disabled {
+      opacity: .65;
+      cursor: default;
+    }
+
+    .text-input {
+      width: 100%;
+      min-width: 0;
+      padding: 12px 14px;
+      border: 1px solid #aab9a2;
+      border-radius: 10px;
+      background: #fffefa;
+      color: var(--ink);
+    }
+
+    /* FINESTRA INICIAL */
+
+    .entry-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow-y: auto;
+      background: rgba(247, 245, 235, .35);
+      -webkit-backdrop-filter: blur(7px);
+      backdrop-filter: blur(7px);
+    }
+
+    .entry-card {
+      flex-shrink: 0;
+      width: min(100%, 460px);
+      margin: auto;
+      padding: 28px;
+      border-color: #d0d9c6;
+      box-shadow: 0 24px 80px rgba(32, 56, 44, .18);
+    }
+
+    .entry-card h1 {
+      margin: 0 0 24px;
+      font-size: 38px;
+      letter-spacing: -.04em;
+    }
+
+    #entry-form { display: grid; gap: 12px; }
+
+    #entry-form > label, .grade-field legend {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .grade-field {
+      display: flex;
+      gap: 12px;
+      margin: 4px 0;
+      padding: 0;
+      border: 0;
+    }
+
+    .grade-field legend { margin-bottom: 10px; padding: 0; }
+
+    .grade-choice {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 10px;
+      padding: 13px;
+      border: 1px solid #aab9a2;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .grade-choice:has(input:checked) {
+      border-color: #6c895c;
+      background: #e3edd0;
+    }
+
+    .grade-choice input { margin: 0; accent-color: #527343; }
+    #entry-status { margin: 0; color: #943828; font-size: 13px; }
+    #entry-form .primary { margin-top: 4px; padding: 13px; }
+
+    #player-summary {
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    /* RELLOTGES */
+
+    .clock {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: #e9eddc;
+      font-size: 14px;
+    }
+
+    .elapsed-clock { justify-content: center; }
+
+    .clock strong {
+      font-size: 22px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .clock[data-urgent="true"] {
+      background: #fae0d5;
+      color: #843627;
+    }
+
+    /* PIRÀMIDE */
+
+    #start {
+      width: 100%;
+      margin-top: 14px;
+      padding: 13px;
+      font-size: 17px;
+    }
+
+    .stage {
+      display: grid;
+      gap: 5px;
+      padding: 24px 8px;
+      border-radius: 15px;
+      background: radial-gradient(ellipse at top, #f4f7e8, #e9efdc);
+    }
+
+    .row {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .cell {
+      display: grid;
+      place-items: center;
+      width: min(82px, calc((100% - 15px) / 4));
+      height: clamp(40px, 9vw, 64px);
+      border-radius: 10px;
+      color: var(--ink);
+      font-size: clamp(18px, 4vw, 28px);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .given {
+      border: 1px solid #acc094;
+      background: var(--given);
+    }
+
+    input.cell {
+      display: block;
+      min-width: 0;
+      padding: 0 3px;
+      border: 2px solid #83947d;
+      background: #fffefa;
+      text-align: center;
+    }
+
+    input.cell[aria-invalid="true"] {
+      border-color: #a14433;
+      background: #fff1e7;
+    }
+
+    input.cell.correct { border-color: #599344; background: #ecf6db; }
+    input.cell.erased { border-color: #a85c25; background: #fff1d7; }
+
+    /* MISSATGES */
+
+    .status, aside p { color: var(--muted); line-height: 1.5; }
+    .status { min-height: 2.8em; margin: 12px 0 0; }
+    .status[data-tone="error"] { color: #943828; }
+
+    .status[data-tone="success"] {
+      color: #316331;
+      font-weight: 800;
+    }
+
+    .help { font-size: 14px; }
+
+    /* NIVELLS */
+
+    .level-list { display: grid; gap: 8px; margin: 18px 0; }
+
+    .level-option {
+      display: grid;
+      gap: 5px;
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #d4ddcc;
+      border-radius: 13px;
+      background: var(--paper);
+      transition: background .18s, border-color .18s;
+    }
+
+    .level-option:hover {
+      background: #f0f4e7;
+      border-color: #94aa85;
+    }
+
+    .level-option[aria-pressed="true"] {
+      background: #e3edd0;
+      border-color: #6c895c;
+      box-shadow: inset 3px 0 0 #6c895c;
+    }
+
+    .level-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .level-heading strong { font-size: 16px; }
+
+    .level-points {
+      color: #587149;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .level-description {
+      color: #61715d;
+      font-size: 13px;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    /* OPCIONS VOLUNTÀRIES */
+
+    .timed-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      width: 100%;
+      margin-bottom: 14px;
+      padding: 14px;
+      border: 1px solid #d4ddcc;
+      border-radius: 13px;
+      background: var(--paper);
+    }
+
+    .timed-copy { display: grid; gap: 5px; }
+    .timed-copy strong { font-size: 15px; }
+
+    .timed-copy > span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    .switch-track {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      width: 42px;
+      height: 25px;
+      padding: 3px;
+      border-radius: 20px;
+      background: #d5ddce;
+      transition: background .18s;
+    }
+
+    .switch-thumb {
+      width: 19px;
+      height: 19px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 1px 3px #20382c26;
+      transition: transform .18s;
+    }
+
+    .timed-toggle[aria-pressed="true"] .switch-track {
+      background: #527343;
+    }
+
+    .timed-toggle[aria-pressed="true"] .switch-thumb {
+      transform: translateX(17px);
+    }
+
+    /* INFORMACIÓ */
+
+    aside details {
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid var(--line);
+    }
+
+    aside details > summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 15px 4px;
+      border-radius: 6px;
+      color: #354c3b;
+      font-size: 14px;
+      font-weight: 700;
+      list-style: none;
+    }
+
+    aside details > summary::-webkit-details-marker { display: none; }
+
+    aside details > summary::after {
+      content: "+";
+      color: #708267;
+      font-size: 22px;
+      font-weight: 400;
+    }
+
+    aside details[open] > summary::after { content: "−"; }
+    aside details > summary:hover { background: #f0f4e7; }
+
+    aside details > p {
+      margin: 0 4px 14px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .game-info {
+      padding: 0 4px 16px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .game-info h3 {
+      margin: 18px 0 6px;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .game-info h3:first-child { margin-top: 2px; }
+    .game-info p { margin: 0 0 10px; }
+
+    .game-info table {
+      width: 100%;
+      margin: 12px 0 18px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .game-info th, .game-info td {
+      padding: 7px 8px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+
+    .game-info th { background: #edf2e4; color: var(--ink); }
+
+    .game-info th:last-child, .game-info td:last-child {
+      text-align: right;
+    }
+
+    .example { display: grid; gap: 4px; margin: 12px 0 16px; }
+
+    .example .cell {
+      width: 36px;
+      height: 27px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    /* CLASSIFICACIÓ */
+
+    .ranking-panel {
+      --ranking-columns:
+        26px minmax(0, 1fr) 48px minmax(0, 1.5fr) 105px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+    }
+
+    .ranking-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .ranking-badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: #e9eddc;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    #ranking-form .primary { width: 100%; }
+    #ranking-status { color: var(--muted); line-height: 1.5; }
+
+    .ranking-head, #ranking-list li {
+      display: grid;
+      grid-template-columns: var(--ranking-columns);
+      align-items: center;
+      gap: 12px;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .ranking-head {
+      margin-top: 20px;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .ranking-head span:nth-child(n+3) { text-align: center; }
+
+    #ranking-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: ranking;
+    }
+
+    #ranking-list li {
+      counter-increment: ranking;
+      padding-top: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    #ranking-list li::before {
+      content: counter(ranking) ".";
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    #ranking-list li strong {
+      min-width: 0;
+      color: var(--ink);
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    #ranking-list li > div {
+      min-width: 0;
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.4;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+
+    #ranking-list .ranking-grade {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    #ranking-list .ranking-school { color: var(--muted); }
+
+    #ranking-list .ranking-points {
+      color: var(--ink);
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    #ranking-list li:nth-child(1) {
+      background: #fff4cf;
+      border-radius: 10px 10px 0 0;
+    }
+
+    #ranking-list li:nth-child(1)::before {
+      content: "🥇";
+      font-size: 21px;
+    }
+
+    #ranking-list li:nth-child(2) { background: #edf0f3; }
+
+    #ranking-list li:nth-child(2)::before {
+      content: "🥈";
+      font-size: 21px;
+    }
+
+    #ranking-list li:nth-child(3) { background: #f5e7da; }
+
+    #ranking-list li:nth-child(3)::before {
+      content: "🥉";
+      font-size: 21px;
+    }
+
+    #ranking-list li:nth-child(-n+3) strong { font-weight: 900; }
+
+    #ranking-more {
+      display: block;
+      margin: 16px auto 0;
+      text-align: center;
+    }
+
+    footer {
+      padding: 18px 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* ADAPTACIÓ A MÒBIL */
+
+    @media (max-width: 700px) {
+      .layout { grid-template-columns: 1fr; }
+      .card { padding: 15px; }
+      .entry-card { padding: 24px; }
+    }
+
+    @media (max-width: 480px) {
+      .ranking-panel {
+        --ranking-columns:
+          20px minmax(0, 1fr) 32px minmax(0, 1.2fr) 80px;
+      }
+
+      .ranking-head, #ranking-list li {
+        gap: 5px;
+        padding-left: 4px;
+        padding-right: 4px;
+      }
+
+      .ranking-head { font-size: 10px; }
+
+      #ranking-list li strong, #ranking-list li > div {
+        font-size: 12px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .level-option, .switch-track, .switch-thumb {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body class="entry-open">
+  <!-- ENTRADA AL JOC -->
+
+  <div id="entry-screen" class="entry-overlay">
+    <section
+      class="card entry-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="entry-title"
+    >
+      <h1 id="entry-title">Qui jugarà?</h1>
+
+      <form id="entry-form">
+        <label for="entry-number">Número</label>
+        <input
+          class="text-input"
+          id="entry-number"
+          type="text"
+          inputmode="numeric"
+          pattern="[0-9]+"
+          maxlength="4"
+          autocomplete="off"
+          required
+        >
+
+        <fieldset class="grade-field">
+          <legend>Curs</legend>
+
+          <label class="grade-choice">
+            <input type="radio" name="grade" value="5è" required>
+            <span>5è</span>
+          </label>
+
+          <label class="grade-choice">
+            <input type="radio" name="grade" value="6è" required>
+            <span>6è</span>
+          </label>
+        </fieldset>
+
+        <label for="entry-school">Escola</label>
+        <input
+          class="text-input"
+          id="entry-school"
+          type="text"
+          maxlength="80"
+          autocomplete="organization"
+          required
+        >
+
+        <p id="entry-status" role="status"></p>
+
+        <button class="primary" type="submit">Entra al joc</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- JOC -->
+
+  <main id="game-screen" class="wrap" inert>
+    <p id="player-summary"></p>
+
+    <h1>Piràmides numèriques</h1>
+
+    <p class="intro">
+      Cada casella és la suma de les dues que té just a sota.
+      Omple tots els buits per passar a una piràmide nova.
+    </p>
+
+    <div class="layout">
+      <section class="card" aria-labelledby="puzzle-title">
+        <div class="board-head">
+          <h2 id="puzzle-title">Piràmide 1</h2>
+          <span class="score" id="score">0 resoltes</span>
+          <span class="score" id="points">0 punts totals</span>
+        </div>
+
+        <div class="clock elapsed-clock">
+          <strong
+            id="elapsed"
+            role="timer"
+            aria-label="Temps transcorregut"
+            aria-live="off"
+          >0:00</strong>
+        </div>
+
+        <p class="help" id="last-result" hidden></p>
+
+        <div class="clock" id="clock" hidden>
+          <span>Temps fins que s’esborri un número</span>
+          <strong id="countdown" role="timer" aria-live="off">0:30</strong>
+        </div>
+
+        <form id="puzzle" novalidate>
+          <div
+            class="stage"
+            id="stage"
+            role="group"
+            aria-labelledby="puzzle-title"
+          ></div>
+
+          <button class="primary" type="button" id="start">
+            Comença
+          </button>
+
+          <div class="actions">
+            <button class="primary" type="submit" id="check" disabled>
+              Comprova
+            </button>
+
+            <button class="mode" type="button" id="restart" hidden>
+              Reinicia la piràmide
+            </button>
+          </div>
+        </form>
+
+        <p class="status" id="status" role="status"></p>
+
+        <section class="ranking-panel" aria-labelledby="ranking-title">
+          <div class="ranking-header">
+            <h2 id="ranking-title">Classificació setmanal</h2>
+            <span class="ranking-badge" id="ranking-week">Es reinicia cada dilluns</span>
+          </div>
+
+          <form id="ranking-form" class="actions">
+            <button class="primary" type="submit">
+              Registra la puntuació
+            </button>
+          </form>
+
+          <p class="help" id="ranking-status" role="status"></p>
+
+          <button class="mode" type="button" id="ranking-refresh">
+            Actualitza el rànquing
+          </button>
+
+          <div class="ranking-head" aria-hidden="true">
+            <span>Pos.</span>
+            <span>Número</span>
+            <span>Curs</span>
+            <span>Escola</span>
+            <span>Punts</span>
+          </div>
+
+          <ol id="ranking-list"></ol>
+
+          <button
+            class="mode"
+            type="button"
+            id="ranking-more"
+            aria-expanded="false"
+            aria-controls="ranking-list"
+            hidden
+          >
+            Mostra’n més
+          </button>
+        </section>
+      </section>
+
+      <aside class="card" aria-labelledby="mode-title">
+        <h2 id="mode-title">Quin repte vols?</h2>
+
+        <div
+          class="level-list"
+          role="group"
+          aria-label="Nivell de dificultat"
+        >
+          <button
+            class="mode level-option"
+            type="button"
+            data-mode="base"
+            aria-pressed="true"
+          >
+            <span class="level-heading">
+              <strong>Fàcil</strong>
+              <span class="level-points">×1 punts</span>
+            </span>
+            <span class="level-description">Amb la base donada</span>
+          </button>
+
+          <button
+            class="mode level-option"
+            type="button"
+            data-mode="mixed"
+            aria-pressed="false"
+          >
+            <span class="level-heading">
+              <strong>Mitjà</strong>
+              <span class="level-points">×1,25 punts</span>
+            </span>
+            <span class="level-description">Amb buits a la base</span>
+          </button>
+
+          <button
+            class="mode level-option"
+            type="button"
+            data-mode="decimal"
+            aria-pressed="false"
+          >
+            <span class="level-heading">
+              <strong>Difícil</strong>
+              <span class="level-points">×1,5 punts</span>
+            </span>
+            <span class="level-description">Amb nombres decimals</span>
+          </button>
+
+          <button
+            class="mode level-option"
+            type="button"
+            data-mode="decimal-mixed"
+            aria-pressed="false"
+          >
+            <span class="level-heading">
+              <strong>Molt difícil</strong>
+              <span class="level-points">×2 punts</span>
+            </span>
+            <span class="level-description">
+              Decimals i buits a la base
+            </span>
+          </button>
+        </div>
+
+        <button
+          class="mode timed-toggle"
+          type="button"
+          id="timed"
+          aria-pressed="false"
+        >
+          <span class="timed-copy">
+            <strong>Contrarellotge</strong>
+            <span>Un número s’esborra cada 30 segons</span>
+          </span>
+
+          <span class="switch-track" aria-hidden="true">
+            <span class="switch-thumb"></span>
+          </span>
+        </button>
+
+        <details class="help">
+          <summary>Info</summary>
+
+          <div class="game-info">
+            <h3>Com es juga?</h3>
+
+            <p>
+              Tria el nivell i prem <strong>Comença</strong>
+              una sola vegada per iniciar la partida.
+            </p>
+
+            <p>
+              Cada casella és la suma de les dues que té just a sota.
+              Completa els buits. Les caselles de color són les pistes.
+            </p>
+
+            <p>
+              Pots moure’t entre els buits amb les
+              <strong>quatre fletxes del teclat</strong> o amb Tab.
+            </p>
+
+            <p>
+              Quan resolguis una piràmide, se’n generarà una altra
+              automàticament. El rellotge mostra el temps total
+              de la partida.
+            </p>
+
+            <h3>Com es guanyen punts?</h3>
+
+            <p>
+              Els punts depenen del temps dedicat a cada piràmide.
+              Com més ràpid la resolguis, més punts obtindràs.
+            </p>
+
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Nivell</th>
+                  <th scope="col">Multiplicador</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Fàcil</td><td>×1</td></tr>
+                <tr><td>Mitjà</td><td>×1,25</td></tr>
+                <tr><td>Difícil</td><td>×1,5</td></tr>
+                <tr><td>Molt difícil</td><td>×2</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Contrarellotge</h3>
+
+            <p>
+              Si l’actives, cada 30 segons s’esborra una pista
+              o una resposta a l’atzar.
+            </p>
+
+            <p>
+              Si el mantens activat des del començament de la piràmide,
+              guanyes un <strong>25 % extra</strong>.
+              Si l’actives a mitja piràmide, el bonus estarà
+              disponible a la següent.
+            </p>
+
+            <p>
+              Amb <strong>Reinicia la piràmide</strong> recuperes
+              les pistes inicials i el compte enrere torna a 30 segons.
+              El temps dedicat a la piràmide continua comptant.
+            </p>
+
+            <h3>Classificació setmanal</h3>
+
+            <p>
+              La classificació es renova cada dilluns.
+              Es conserva la millor partida de la setmana de cada número i escola.
+            </p>
+
+            <p>
+              Es mostren els 20 primers jugadors.
+              Prem <strong>Mostra’n més</strong> per veure la resta.
+            </p>
+
+            <p>
+              Per començar el torn d’un altre alumne,
+              registra el resultat i recarrega la pàgina.
+            </p>
+          </div>
+        </details>
+
+        <details>
+          <summary>Veure un exemple</summary>
+
+          <div
+            class="example"
+            id="example"
+            role="img"
+            aria-label="Piràmide resolta. Base 4, 6, 5 i 3. Pis següent 10, 11 i 8. Després 21 i 19. A dalt 40."
+          ></div>
+
+          <p>4 + 6 = 10 i 6 + 5 = 11. Just a sobre, 10 + 11 = 21.</p>
+        </details>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="wrap" id="site-footer" inert>
+    MADUKA · Materials educatius oberts
+  </footer>
+
+  <script>
+    const get = id => document.getElementById(id);
+
+    // ELEMENTS DEL JOC
+
+    const stage = get('stage');
+    const status = get('status');
+    const check = get('check');
+    const clock = get('clock');
+    const elapsed = get('elapsed');
+    const points = get('points');
+    const lastResult = get('last-result');
+    const countdown = get('countdown');
+    const timedButton = get('timed');
+    const restart = get('restart');
+    const startButton = get('start');
+    const puzzleForm = get('puzzle');
+    const modes = [...document.querySelectorAll('[data-mode]')];
+
+    // CONFIGURACIÓ
+
+    const baseClues = ['0:0', '0:1', '0:2', '0:3'];
+
+    const mixedClues = [
+      ['0:0', '0:3', '1:1', '1:2'],
+      ['0:0', '0:3', '1:0', '1:1'],
+      ['0:0', '0:1', '0:3', '1:2'],
+      ['0:0', '0:2', '0:3', '2:0'],
+      ['0:0', '0:1', '0:2', '3:0'],
+      ['0:1', '0:2', '0:3', '3:0']
+    ];
+
+    const levelMultipliers = {
+      base: 1,
+      mixed: 1.25,
+      decimal: 1.5,
+      'decimal-mixed': 2
+    };
+
+    const intervalMs = 30000;
+    const used = new Set();
+
+    // ESTAT DE LA PARTIDA
+
+    let playerProfile = null;
+    let mode = 'base';
+    let timed = false;
+    let sessionStarted = false;
+    let puzzleStarted = false;
+    let qualifiesForTimedBonus = false;
+    let solved = 0;
+    let totalPoints = 0;
+    let startedAt = 0;
+    let pyramidStartedAt = 0;
+    let puzzle;
+    let tiles = [];
+    let transition = null;
+    let timer = null;
+    let deadline = 0;
+
+    timedButton.setAttribute('aria-pressed', 'false');
+
+    // CONSTRUCCIÓ DE PIRÀMIDES
+
+    function pyramid(base) {
+      const rows = [base];
+
+      while (rows.at(-1).length > 1) {
+        const row = rows.at(-1);
+
+        rows.push(
+          row.slice(1).map((value, index) => row[index] + value)
+        );
+      }
+
+      return rows;
+    }
+
+    function nextBase() {
+      if (used.size === 6561) used.clear();
+
+      let base;
+
+      do {
+        base = Array.from(
+          { length: 4 },
+          () => 1 + Math.floor(Math.random() * 9)
+        );
+      } while (used.has(base.join('')));
+
+      used.add(base.join(''));
+      return base;
+    }
+
+    function formatValue(value, decimal) {
+      return decimal
+        ? (value / 10).toFixed(1).replace('.', ',')
+        : String(value);
+    }
+
+    function makeInput(tile) {
+      const input = document.createElement('input');
+
+      input.className = 'cell';
+      input.type = 'text';
+      input.inputMode = tile.decimal ? 'decimal' : 'numeric';
+      input.autocomplete = 'off';
+      input.readOnly = !puzzleStarted;
+      input.setAttribute('aria-label', tile.label);
+
+      return input;
+    }
+
+    function displayBoard(container, rows, clues, decimal = false) {
+      container.replaceChildren();
+      const cells = [];
+
+      for (let floor = rows.length - 1; floor >= 0; floor--) {
+        const row = document.createElement('div');
+        row.className = 'row';
+
+        rows[floor].forEach((value, col) => {
+          const given = !clues || clues.includes(floor + ':' + col);
+
+          const label =
+            'Pis ' + (floor + 1) +
+            ' des de baix, casella ' + (col + 1) +
+            ' des de l’esquerra';
+
+          const tile = {
+            value,
+            decimal,
+            given,
+            label,
+            floor,
+            col
+          };
+
+          if (given) {
+            const text = formatValue(value, decimal);
+
+            tile.element = document.createElement('span');
+            tile.element.className = 'cell given';
+            tile.element.textContent = text;
+
+            tile.element.setAttribute(
+              'aria-label',
+              label + ', número donat ' + text
+            );
+          } else {
+            tile.element = makeInput(tile);
+          }
+
+          cells.push(tile);
+          row.append(tile.element);
+        });
+
+        container.append(row);
+      }
+
+      return cells;
+    }
+
+    // MISSATGES, RELLOTGE I PUNTS
+
+    function announce(message, tone = '') {
+      status.textContent = message;
+      status.dataset.tone = tone;
+    }
+
+    function formatTime(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      return minutes + ':' + String(seconds % 60).padStart(2, '0');
+    }
+
+    function pointsFor(milliseconds) {
+      const speedPoints = 1000 / (1 + milliseconds / 30000);
+      const levelMultiplier = levelMultipliers[puzzle.levelMode];
+      const timedMultiplier = qualifiesForTimedBonus ? 1.25 : 1;
+
+      return Math.max(
+        1,
+        Math.round(speedPoints * levelMultiplier * timedMultiplier)
+      );
+    }
+
+    function stopClock() {
+      clearInterval(timer);
+      timer = null;
+    }
+
+    function eraseNumber() {
+      const candidates = tiles.filter(tile =>
+        tile.given ||
+        /^\d+(?:[,.]\d+)?$/.test(tile.element.value.trim())
+      );
+
+      if (candidates.length === 0) {
+        announce('No hi ha cap número per esborrar.');
+        return;
+      }
+
+      const tile = candidates[
+        Math.floor(Math.random() * candidates.length)
+      ];
+
+      if (tile.given) {
+        const input = makeInput(tile);
+
+        tile.element.replaceWith(input);
+        tile.element = input;
+        tile.given = false;
+      } else {
+        tile.element.value = '';
+        tile.element.removeAttribute('aria-invalid');
+      }
+
+      stage.querySelector('.erased')?.classList.remove('erased');
+      tile.element.classList.add('erased');
+
+      announce('S’ha esborrat un número. ' + tile.label + '.');
+    }
+
+    function updateClock() {
+      if (!sessionStarted) return;
+
+      const now = performance.now();
+
+      elapsed.textContent = formatTime(
+        Math.floor((now - startedAt) / 1000)
+      );
+
+      if (!puzzleStarted || transition !== null || !timed) return;
+
+      if (now >= deadline) {
+        eraseNumber();
+        deadline = now + intervalMs;
+      }
+
+      const seconds = Math.ceil((deadline - now) / 1000);
+
+      countdown.textContent = formatTime(seconds);
+      clock.dataset.urgent = String(seconds <= 5);
+    }
+
+    function startClock() {
+      stopClock();
+
+      const running = puzzleStarted && transition === null;
+
+      clock.hidden = !timed || !running;
+      restart.hidden = !timed || !running;
+
+      if (!sessionStarted) return;
+
+      deadline = performance.now() + intervalMs;
+      updateClock();
+      timer = setInterval(updateClock, 100);
+    }
+
+    // PREPARACIÓ DELS REPTES
+
+    function renderPuzzle() {
+      tiles = displayBoard(
+        stage,
+        puzzle.rows,
+        puzzle.clues,
+        puzzle.decimal
+      );
+
+      get('puzzle-title').textContent = 'Piràmide ' + (solved + 1);
+
+      check.disabled = !puzzleStarted;
+      restart.disabled = false;
+
+      startClock();
+    }
+
+    function newPuzzle() {
+      clearTimeout(transition);
+      transition = null;
+
+      stopClock();
+
+      puzzleStarted = sessionStarted;
+
+      const decimal =
+        mode === 'decimal' || mode === 'decimal-mixed';
+
+      const mixed =
+        mode === 'mixed' || mode === 'decimal-mixed';
+
+      const clues = mixed
+        ? mixedClues[solved % mixedClues.length]
+        : baseClues;
+
+      const base = nextBase();
+
+      // Càlcul amb dècimes enteres per evitar errors decimals.
+
+      const values = decimal
+        ? base.map(value =>
+            value * 10 + 1 + Math.floor(Math.random() * 9)
+          )
+        : base;
+
+      puzzle = {
+        rows: pyramid(values),
+        clues,
+        decimal,
+        levelMode: mode
+      };
+
+      qualifiesForTimedBonus = sessionStarted && timed;
+      pyramidStartedAt = performance.now();
+
+      if (!sessionStarted) {
+        elapsed.textContent = '0:00';
+      }
+
+      countdown.textContent = '0:30';
+      clock.dataset.urgent = 'false';
+
+      renderPuzzle();
+      startButton.hidden = sessionStarted;
+
+      if (sessionStarted) {
+        announce('');
+        focusFirstInput();
+      } else {
+        announce('Prem Comença per iniciar la partida.');
+      }
+    }
+
+    function focusFirstInput() {
+      const firstInput = [...tiles]
+        .reverse()
+        .find(tile => !tile.given);
+
+      firstInput?.element.focus({ preventScroll: true });
+    }
+
+    // NAVEGACIÓ AMB LES FLETXES
+
+    function moveFocus(event) {
+      const directions = [
+        'ArrowLeft',
+        'ArrowRight',
+        'ArrowUp',
+        'ArrowDown'
+      ];
+
+      if (
+        !directions.includes(event.key) ||
+        !puzzleStarted ||
+        transition !== null
+      ) {
+        return;
+      }
+
+      const current = tiles.find(tile =>
+        tile.element === event.target
+      );
+
+      if (!current || current.given) return;
+
+      event.preventDefault();
+
+      const editable = tiles.filter(tile =>
+        !tile.given && !tile.element.readOnly
+      );
+
+      let target;
+
+      if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        const step = event.key === 'ArrowLeft' ? -1 : 1;
+
+        target = editable
+          .filter(tile =>
+            tile.floor === current.floor &&
+            (tile.col - current.col) * step > 0
+          )
+          .sort((a, b) =>
+            Math.abs(a.col - current.col) -
+            Math.abs(b.col - current.col)
+          )[0];
+      } else {
+        const step = event.key === 'ArrowUp' ? 1 : -1;
+        const currentX = current.col + current.floor / 2;
+
+        target = editable
+          .filter(tile =>
+            (tile.floor - current.floor) * step > 0
+          )
+          .sort((a, b) =>
+            Math.abs(a.floor - current.floor) -
+            Math.abs(b.floor - current.floor) ||
+            Math.abs(a.col + a.floor / 2 - currentX) -
+            Math.abs(b.col + b.floor / 2 - currentX) ||
+            a.col - b.col
+          )[0];
+      }
+
+      if (target) {
+        target.element.focus({ preventScroll: true });
+        target.element.select();
+      }
+    }
+
+    // COMPROVACIÓ DE RESPOSTES
+
+    function matches(tile) {
+      const answer = tile.element.value.trim();
+
+      if (tile.decimal) {
+        return /^\d+(?:[,.]\d+)?$/.test(answer) &&
+          Number(answer.replace(',', '.')) === tile.value / 10;
+      }
+
+      return /^\d+$/.test(answer) &&
+        Number(answer) === tile.value;
+    }
+
+    function evaluate(showFeedback) {
+      if (!puzzleStarted || transition !== null) return;
+
+      const fields = tiles.filter(tile => !tile.given);
+
+      if (fields.every(matches)) {
+        const duration = performance.now() - pyramidStartedAt;
+        const time = formatTime(Math.floor(duration / 1000));
+        const earned = pointsFor(duration);
+        const result = time + ' · +' + earned + ' punts';
+
+        clock.hidden = true;
+
+        totalPoints += earned;
+        points.textContent = totalPoints + ' punts totals';
+
+        lastResult.textContent = 'Última piràmide · ' + result;
+        lastResult.hidden = false;
+
+        solved++;
+
+        get('score').textContent =
+          solved + (solved === 1 ? ' resolta' : ' resoltes');
+
+        fields.forEach(({ element }) => {
+          element.removeAttribute('aria-invalid');
+          element.classList.remove('erased');
+          element.classList.add('correct');
+          element.readOnly = true;
+        });
+
+        check.disabled = true;
+        restart.disabled = true;
+
+        announce('Correcte! ' + result, 'success');
+
+        transition = setTimeout(() => {
+          newPuzzle();
+        }, 1500);
+
+        return;
+      }
+
+      if (!showFeedback) return;
+
+      let errors = 0;
+
+      fields.forEach(tile => {
+        const wrong =
+          tile.element.value.trim() !== '' && !matches(tile);
+
+        if (wrong) {
+          errors++;
+          tile.element.setAttribute('aria-invalid', 'true');
+        } else {
+          tile.element.removeAttribute('aria-invalid');
+        }
+      });
+
+      announce(
+        errors
+          ? 'Revisa les caselles marcades.'
+          : 'Encara hi ha caselles buides.',
+        'error'
+      );
+    }
+
+    // CONTROLS DEL JOC
+
+    startButton.addEventListener('click', () => {
+      if (!playerProfile || sessionStarted) return;
+
+      sessionStarted = true;
+      puzzleStarted = true;
+      qualifiesForTimedBonus = timed;
+
+      const now = performance.now();
+
+      startedAt = now;
+      pyramidStartedAt = now;
+
+      startButton.hidden = true;
+      check.disabled = false;
+
+      tiles
+        .filter(tile => !tile.given)
+        .forEach(tile => {
+          tile.element.readOnly = false;
+        });
+
+      startClock();
+      announce('');
+      focusFirstInput();
+    });
+
+    stage.addEventListener('keydown', moveFocus);
+
+    stage.addEventListener('input', event => {
+      event.target.removeAttribute('aria-invalid');
+      event.target.classList.remove('erased');
+
+      announce('');
+      evaluate(false);
+    });
+
+    puzzleForm.addEventListener('submit', event => {
+      event.preventDefault();
+      evaluate(true);
+    });
+
+    modes.forEach(button => {
+      button.addEventListener('click', () => {
+        if (mode === button.dataset.mode) return;
+
+        mode = button.dataset.mode;
+
+        modes.forEach(item => {
+          item.setAttribute(
+            'aria-pressed',
+            String(item === button)
+          );
+        });
+
+        newPuzzle();
+      });
+    });
+
+    timedButton.addEventListener('click', () => {
+      timed = !timed;
+
+      if (!timed) {
+        qualifiesForTimedBonus = false;
+      }
+
+      timedButton.setAttribute('aria-pressed', String(timed));
+      startClock();
+
+      announce(
+        timed
+          ? 'Contrarellotge activat.'
+          : 'Contrarellotge desactivat.'
+      );
+    });
+
+    restart.addEventListener('click', () => {
+      if (!puzzleStarted || transition !== null) return;
+
+      renderPuzzle();
+
+      announce(
+        'Pistes inicials recuperades. ' +
+        'El compte enrere torna a 30 segons.'
+      );
+
+      focusFirstInput();
+    });
+
+    // CLASSIFICACIÓ SETMANAL COMPARTIDA
+
+    const rankingUrl =
+      'https://script.google.com/macros/s/AKfycbx2ZnkJoNADzC7sBuChCE-r8rM7kWGsoMWG9RFl3ngeTcihUcjdTPHMPgqDiqz-2vrk/exec';
+
+    const rankingForm = get('ranking-form');
+    const rankingList = get('ranking-list');
+    const rankingStatus = get('ranking-status');
+    const rankingRefresh = get('ranking-refresh');
+    const rankingMore = get('ranking-more');
+    const rankingWeekBadge = get('ranking-week');
+
+    const rankingSubmit =
+      rankingForm.querySelector('button[type="submit"]');
+
+    let rankingBusy = false;
+    let rankingEntries = [];
+    let rankingExpanded = false;
+
+    function getCurrentWeekId(date = new Date()) {
+      const target = new Date(Date.UTC(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+      ));
+      const dayNum = target.getUTCDay() || 7;
+      target.setUTCDate(target.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
+      const weekNo = Math.ceil((((target - yearStart) / 86400000) + 1) / 7);
+      return target.getUTCFullYear() + '-W' + String(weekNo).padStart(2, '0');
+    }
+
+    function renderRanking() {
+      rankingList.replaceChildren();
+
+      const visibleEntries = rankingExpanded
+        ? rankingEntries
+        : rankingEntries.slice(0, 20);
+
+      visibleEntries.forEach(({ name, grade, school, score }) => {
+        const item = document.createElement('li');
+        const player = document.createElement('strong');
+        const gradeLabel = document.createElement('div');
+        const schoolLabel = document.createElement('div');
+        const pointsLabel = document.createElement('div');
+
+        gradeLabel.className = 'ranking-grade';
+        schoolLabel.className = 'ranking-school';
+        pointsLabel.className = 'ranking-points';
+
+        player.textContent = /^\d+$/.test(String(name).trim())
+          ? '#' + String(name).trim()
+          : name;
+        gradeLabel.textContent = grade || '—';
+        schoolLabel.textContent = school;
+
+        pointsLabel.textContent =
+          Number(score).toLocaleString('ca-ES') + ' punts';
+
+        item.append(
+          player,
+          gradeLabel,
+          schoolLabel,
+          pointsLabel
+        );
+
+        rankingList.append(item);
+      });
+
+      rankingMore.hidden = rankingEntries.length <= 20;
+
+      rankingMore.textContent = rankingExpanded
+        ? 'Mostra’n menys'
+        : 'Mostra’n més';
+
+      rankingMore.setAttribute(
+        'aria-expanded',
+        String(rankingExpanded)
+      );
+    }
+
+    function showRanking(entries, weekId) {
+      if (weekId) {
+        rankingWeekBadge.textContent = 'Setmana ' + weekId.split('-W')[1];
+      }
+
+      rankingEntries = [...entries].sort((a, b) =>
+        Number(b.score) - Number(a.score) ||
+        String(a.name).localeCompare(String(b.name), 'ca', { numeric: true })
+      );
+
+      renderRanking();
+    }
+
+    async function requestRanking(options = {}) {
+      const controller = new AbortController();
+
+      const timeout = setTimeout(() => {
+        controller.abort();
+      }, 30000);
+
+      try {
+        const response = await fetch(rankingUrl, {
+          ...options,
+          cache: 'no-store',
+          signal: controller.signal
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            'No s’ha pogut connectar amb la classificació.'
+          );
+        }
+
+        const data = await response.json();
+
+        if (data.ok === false || !Array.isArray(data.entries)) {
+          throw new Error(data.error || 'Resposta incorrecta.');
+        }
+
+        return data;
+      } finally {
+        clearTimeout(timeout);
+      }
+    }
+
+    function setRankingBusy(busy) {
+      rankingBusy = busy;
+      rankingSubmit.disabled = busy;
+      rankingRefresh.disabled = busy;
+    }
+
+    async function refreshRanking() {
+      if (rankingBusy) return;
+
+      setRankingBusy(true);
+      rankingStatus.textContent = 'Carregant la classificació…';
+
+      try {
+        const currentWeek = getCurrentWeekId();
+        const data = await requestRanking();
+
+        // Filtra per setmana si el servidor retorna el camp week
+        const filteredEntries = data.week
+          ? data.entries
+          : data.entries.filter(e => !e.week || e.week === currentWeek);
+
+        showRanking(filteredEntries, data.week || currentWeek);
+
+        rankingStatus.textContent = filteredEntries.length
+          ? 'Classificació actualitzada.'
+          : 'Encara no hi ha cap partida registrada aquesta setmana.';
+      } catch {
+        rankingStatus.textContent =
+          'No s’ha pogut carregar la classificació. Torna-ho a provar.';
+      } finally {
+        setRankingBusy(false);
+      }
+    }
+
+    rankingForm.addEventListener('submit', async event => {
+      event.preventDefault();
+
+      if (rankingBusy) return;
+
+      if (!playerProfile || totalPoints <= 0 || solved <= 0) {
+        rankingStatus.textContent =
+          'Resol almenys una piràmide abans de registrar la puntuació.';
+        return;
+      }
+
+      const { number, school, grade } = playerProfile;
+      const score = totalPoints;
+      const elapsedSeconds = Math.floor((performance.now() - startedAt) / 1000);
+      const week = getCurrentWeekId();
+
+      // Validació bàsica de coherència (màxim 2500 punts per piràmide resolta)
+      if (score > solved * 2500 || elapsedSeconds < solved) {
+        rankingStatus.textContent = 'Puntuació no vàlida.';
+        return;
+      }
+
+      setRankingBusy(true);
+      rankingStatus.textContent = 'Registrant la puntuació…';
+
+      try {
+        const data = await requestRanking({
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify({
+            name: number,
+            school,
+            grade,
+            score,
+            solved,
+            elapsedSeconds,
+            week
+          })
+        });
+
+        const currentWeek = getCurrentWeekId();
+        const filteredEntries = data.week
+          ? data.entries
+          : data.entries.filter(e => !e.week || e.week === currentWeek);
+
+        showRanking(filteredEntries, data.week || currentWeek);
+
+        rankingStatus.textContent = data.improved
+          ? 'Puntuació registrada! Pots continuar sumant punts.'
+          : 'Ja tens una partida igual o millor registrada aquesta setmana.';
+      } catch {
+        rankingStatus.textContent =
+          'No s’ha pogut confirmar el resultat. ' +
+          'Pots tornar-lo a registrar.';
+      } finally {
+        setRankingBusy(false);
+      }
+    });
+
+    rankingRefresh.addEventListener('click', refreshRanking);
+
+    rankingMore.addEventListener('click', () => {
+      rankingExpanded = !rankingExpanded;
+      renderRanking();
+    });
+
+    // ENTRADA AL JOC
+
+    get('entry-number').addEventListener('input', event => {
+      event.target.value = event.target.value.replace(/\D+/g, '');
+    });
+
+    get('entry-form').addEventListener('submit', event => {
+      event.preventDefault();
+
+      if (playerProfile) return;
+
+      const form = event.currentTarget;
+
+      if (!form.reportValidity()) return;
+
+      const rawNumber = get('entry-number').value.trim();
+      const parsedNumber = Number.parseInt(rawNumber, 10);
+
+      const school = get('entry-school').value
+        .normalize('NFKC')
+        .trim()
+        .replace(/\s+/g, ' ');
+
+      const grade = form
+        .querySelector('input[name="grade"]:checked')
+        ?.value;
+
+      if (
+        !/^\d+$/.test(rawNumber) ||
+        !Number.isInteger(parsedNumber) ||
+        parsedNumber <= 0 ||
+        parsedNumber > 9999 ||
+        !school ||
+        school.length > 80 ||
+        !['5è', '6è'].includes(grade)
+      ) {
+        get('entry-status').textContent =
+          'Introdueix un número vàlid, el curs i l’escola.';
+        return;
+      }
+
+      const number = String(parsedNumber);
+
+      playerProfile = Object.freeze({
+        number,
+        school,
+        grade
+      });
+
+      get('player-summary').textContent =
+        'Número ' + number + ' · ' + grade + ' · ' + school;
+
+      get('entry-screen').hidden = true;
+      get('game-screen').inert = false;
+      get('site-footer').inert = false;
+
+      document.body.classList.remove('entry-open');
+
+      startButton.focus({ preventScroll: true });
+    });
+
+    // FOCUS DE LA FINESTRA INICIAL
+
+    get('entry-screen').addEventListener('keydown', event => {
+      if (event.key !== 'Tab') return;
+
+      const focusable = [
+        ...get('entry-screen').querySelectorAll(
+          'input, select, button, a[href]'
+        )
+      ].filter(element => !element.disabled);
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        document.activeElement === last
+      ) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+
+    // PREPARACIÓ INICIAL SENSE ACTIVAR EL RELLOTGE
+
+    displayBoard(get('example'), pyramid([4, 6, 5, 3]));
+    newPuzzle();
+    refreshRanking();
+
+    get('entry-number').focus({ preventScroll: true });
+  </script>
+</body>
+</html>
