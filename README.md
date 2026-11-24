@@ -26,7 +26,7 @@ Aquest repositori allotja el portal web d'accés ràpid a una col·lecció d'ein
 * **📐 [Menseki Meiro](https://cromer23cat.github.io/matematiques/Menseki_Meiro/index.html)**
   Laberints d'àrees visuals d'origen japonès per desenvolupar el raonament geomètric sense necessitat d'operar amb decimals o fraccions complexes.
 
-* **🚴 [El Tour de Mates](https://cromer23cat.github.io/matematiquestour_de_mates/index.html)**
+* **🚴 [El Tour de Mates](https://cromer23cat.github.io/matematiques/tour_de_mates/index.html)**
   Directori d'accés ràpid a píndoles de càlcul mental i recursos gamificats vinculats al projecte *El Tour de Mates*.
 
 ### 📖 Llengua Castellana
