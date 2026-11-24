@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratori de l'Atzar - Matemàtiques Cicle Superior</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js per als gràfics estadístics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome per a les icones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Fredoka & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            purple: '#6C5CE7',
+                            pink: '#FD79A8',
+                            yellow: '#FDCB6E',
+                            green: '#00B894',
+                            blue: '#0984E3',
+                            bg: '#F8F9FA'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F3F4F6;
+        }
+        h1, h2, h3, .font-fun {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+
+        /* 3D coin styling */
+        .coin-container {
+            perspective: 1000px;
+        }
+        .coin {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease-out;
+        }
+        .coin-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15), inset 0 0 0 4px #e2e8f0;
+        }
+        .coin-heads {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #78350f;
+        }
+        .coin-tails {
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            color: #1e3a8a;
+            transform: rotateY(180deg);
+        }
+
+        /* Dice styling */
+        .dice {
+            width: 70px;
+            height: 70px;
+            background: white;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1), inset 0 0 0 2px #e5e7eb;
+            transition: transform 0.3s ease;
+        }
+
+        /* Ball animation */
+        .ball {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: inset -6px -6px 12px rgba(0,0,0,0.3), 0 6px 12px rgba(0,0,0,0.15);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes flipSpin {
+            0% { transform: rotateY(0deg) scale(1); }
+            50% { transform: rotateY(900deg) scale(1.3); }
+            100% { transform: rotateY(1800deg) scale(1); }
+        }
+
+        @keyframes diceShake {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-15deg) scale(1.1); }
+            50% { transform: rotate(15deg) scale(1.1); }
+            75% { transform: rotate(-10deg) scale(1.05); }
+            100% { transform: rotate(0deg) scale(1); }
+        }
+
+        @keyframes bagPop {
+            0% { transform: translateY(30px) scale(0.2); opacity: 0; }
+            70% { transform: translateY(-10px) scale(1.1); opacity: 1; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .anim-flip { animation: flipSpin 0.8s ease-in-out; }
+        .anim-dice { animation: diceShake 0.6s ease-in-out; }
+        .anim-ball { animation: bagPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- Navbar / Header -->
+    <header class="bg-white shadow-md border-b-4 border-indigo-500 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-600 text-white p-3 rounded-2xl shadow-lg transform -rotate-3">
+                    <i class="fa-solid fa-flask text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-indigo-900 tracking-tight">Laboratori de l'Atzar</h1>
+                    <p class="text-xs sm:text-sm font-medium text-slate-500">Experimenta amb la probabilitat - Cicle Superior de Primària</p>
+                </div>
+            </div>
+
+            <div class="flex items-center bg-indigo-50 p-1.5 rounded-2xl border border-indigo-100 shadow-inner">
+                <button id="soundToggleBtn" onclick="toggleSound()" class="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-white shadow-sm text-indigo-700 font-semibold text-xs sm:text-sm hover:bg-indigo-100 transition">
+                    <i id="soundIcon" class="fa-solid fa-volume-high"></i>
+                    <span id="soundText">Sons actius</span>
+                </button>
+                <button onclick="resetAllData()" class="flex items-center space-x-2 px-3 py-1.5 rounded-xl text-rose-600 hover:bg-rose-50 font-semibold text-xs sm:text-sm transition ml-1">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Reiniciar tot</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8 flex-grow w-full">
+        
+        <!-- Tool Selector Tabs -->
+        <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
+            <button id="tabCoins" onclick="switchTool('coins')" class="tool-tab flex flex-col sm:flex-row items-center justify-center p-3 sm:p-4 rounded-2xl border-2 font-fun text-base sm:text-lg transition-all shadow-sm bg-white border-indigo-500 text-indigo-600 shadow-indigo-100">
+                <span class="text-2xl sm:text-3xl mb-1 sm:mb-0 sm:mr-3">🪙</span>
+                <span class="font-bold">Monedes</span>
+            </button>
+            
+            <button id="tabDice" onclick="switchTool('dice')" class="tool-tab flex flex-col sm:flex-row items-center justify-center p-3 sm:p-4 rounded-2xl border-2 font-fun text-base sm:text-lg transition-all shadow-sm bg-white border-transparent text-slate-600 hover:border-slate-300">
+                <span class="text-2xl sm:text-3xl mb-1 sm:mb-0 sm:mr-3">🎲</span>
+                <span class="font-bold">Daus</span>
+            </button>
+
+            <button id="tabBag" onclick="switchTool('bag')" class="tool-tab flex flex-col sm:flex-row items-center justify-center p-3 sm:p-4 rounded-2xl border-2 font-fun text-base sm:text-lg transition-all shadow-sm bg-white border-transparent text-slate-600 hover:border-slate-300">
+                <span class="text-2xl sm:text-3xl mb-1 sm:mb-0 sm:mr-3">🎒</span>
+                <span class="font-bold">Bossa de Boles</span>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Column: Controls & Visualizer (5 Cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                
+                <!-- Experiment Setup Card -->
+                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200">
+                    <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center">
+                        <i class="fa-solid fa-sliders text-indigo-500 mr-2"></i> Configura l'experiment
+                    </h2>
+
+                    <!-- Quantity Selector (1, 2, or 3) -->
+                    <div class="mb-5">
+                        <label class="block text-sm font-semibold text-slate-600 mb-2">
+                            Quantitat d'elements a utilitzar:
+                        </label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="setQuantity(1)" id="qtyBtn1" class="qty-btn py-2.5 rounded-xl border-2 font-bold text-sm transition text-center border-indigo-600 bg-indigo-50 text-indigo-700">
+                                1 Unitat
+                            </button>
+                            <button onclick="setQuantity(2)" id="qtyBtn2" class="qty-btn py-2.5 rounded-xl border-2 font-bold text-sm transition text-center border-slate-200 text-slate-600 hover:border-slate-300">
+                                2 Unitats
+                            </button>
+                            <button onclick="setQuantity(3)" id="qtyBtn3" class="qty-btn py-2.5 rounded-xl border-2 font-bold text-sm transition text-center border-slate-200 text-slate-600 hover:border-slate-300">
+                                3 Unitats
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Custom Bag Setup (Only visible for 'bag' tool) -->
+                    <div id="bagCustomizer" class="hidden mb-5 bg-amber-50 p-4 rounded-2xl border border-amber-200">
+                        <label class="block text-xs font-bold text-amber-900 uppercase tracking-wider mb-2">
+                            Composició de la Bossa (Total: 5 boles)
+                        </label>
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-4 h-4 rounded-full bg-red-500 inline-block shadow"></span>
+                                <span class="text-sm font-bold text-slate-700">Vermelles:</span>
+                                <span id="redCountLabel" class="font-extrabold text-red-600 text-lg">3</span>
+                            </div>
+                            <input type="range" id="redSlider" min="0" max="5" value="3" step="1" oninput="updateBagComposition(this.value)" class="w-28 accent-red-500 cursor-pointer">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-4 h-4 rounded-full bg-blue-500 inline-block shadow"></span>
+                                <span class="text-sm font-bold text-slate-700">Blaves:</span>
+                                <span id="blueCountLabel" class="font-extrabold text-blue-600 text-lg">2</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-amber-700 mt-2 italic">
+                            💡 Extracció <span class="font-semibold">sense reposició</span> en cada intent de múltiples boles.
+                        </p>
+                    </div>
+
+                    <!-- Number of Experiments Inputs -->
+                    <div class="mb-5">
+                        <label class="block text-sm font-semibold text-slate-600 mb-2">
+                            Nombre d'intents (simulacions):
+                        </label>
+                        <div class="flex flex-wrap gap-2 mb-3">
+                            <button onclick="setAttempts(1)" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-100 hover:text-indigo-700 font-medium text-xs text-slate-700 transition">1</button>
+                            <button onclick="setAttempts(10)" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-100 hover:text-indigo-700 font-medium text-xs text-slate-700 transition">10</button>
+                            <button onclick="setAttempts(50)" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-100 hover:text-indigo-700 font-medium text-xs text-slate-700 transition">50</button>
+                            <button onclick="setAttempts(100)" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-100 hover:text-indigo-700 font-medium text-xs text-slate-700 transition">100</button>
+                            <button onclick="setAttempts(1000)" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-indigo-100 hover:text-indigo-700 font-medium text-xs text-slate-700 transition">1000</button>
+                        </div>
+                        <div class="relative">
+                            <input type="number" id="attemptsInput" value="1" min="1" max="10000" class="w-full pl-4 pr-12 py-2.5 rounded-xl border border-slate-300 font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                            <span class="absolute right-3 top-2.5 text-xs font-semibold text-slate-400">intents</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Button -->
+                    <button id="runBtn" onclick="runSimulation()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-fun text-xl rounded-2xl shadow-lg shadow-indigo-200 transition active:scale-95 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-play"></i>
+                        <span>Fes l'experiment!</span>
+                    </button>
+                </div>
+
+                <!-- Live Interactive Stage -->
+                <div class="bg-gradient-to-br from-indigo-900 to-slate-900 p-6 rounded-3xl text-white shadow-xl flex flex-col justify-between min-h-[260px] relative overflow-hidden">
+                    <div class="flex items-center justify-between border-b border-indigo-800/80 pb-3">
+                        <span class="text-xs font-bold text-indigo-300 uppercase tracking-wider">Escenari Virtual</span>
+                        <span id="stageBadge" class="bg-indigo-800/60 text-indigo-200 text-xs px-2.5 py-1 rounded-full font-medium">1 Moneda</span>
+                    </div>
+
+                    <!-- Dynamic Animation Container -->
+                    <div id="visualizerZone" class="py-6 flex items-center justify-center gap-4 my-2">
+                        <!-- Populated dynamically by JS -->
+                    </div>
+
+                    <!-- Last Result Text Banner -->
+                    <div class="bg-indigo-950/70 backdrop-blur-md rounded-2xl p-3 text-center border border-indigo-800/50">
+                        <span class="text-xs text-indigo-300 block font-medium">Últim resultat obtingut:</span>
+                        <span id="lastResultText" class="text-lg font-bold text-amber-300 font-fun">Prem el botó per començar!</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Results Table, Chart & Log (7 Cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+                
+                <!-- Results & Frequencies Table -->
+                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800 flex items-center">
+                                <i class="fa-solid fa-chart-pie text-emerald-500 mr-2"></i> Taula de Freqüències
+                            </h2>
+                            <p class="text-xs text-slate-500">
+                                Total d'intents acumulats: <span id="totalAttemptsCounter" class="font-bold text-indigo-600">0</span>
+                            </p>
+                        </div>
+                        <button onclick="clearCurrentData()" class="self-start sm:self-auto text-xs font-semibold text-slate-500 hover:text-rose-600 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition">
+                            <i class="fa-solid fa-trash-can mr-1"></i> Neteja taula
+                        </button>
+                    </div>
+
+                    <!-- Frequency Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50 text-slate-600 uppercase text-[11px] font-bold tracking-wider rounded-xl">
+                                <tr>
+                                    <th class="p-3 rounded-l-xl">Resultat Possible</th>
+                                    <th class="p-3 text-center">Freq. Absoluta (f)</th>
+                                    <th class="p-3 text-center">Freq. Relativa (%)</th>
+                                    <th class="p-3 text-center rounded-r-xl">Prob. Teòrica</th>
+                                </tr>
+                            </thead>
+                            <tbody id="frequencyTableBody" class="divide-y divide-slate-100 font-medium">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Graphic Visualization -->
+                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200">
+                    <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center">
+                        <i class="fa-solid fa-chart-column text-blue-500 mr-2"></i> Representació Gràfica
+                    </h2>
+                    <div class="h-64 w-full relative">
+                        <canvas id="resultsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Didactic Tip Box -->
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start space-x-3">
+                    <div class="bg-amber-400 text-amber-950 p-2 rounded-xl text-xl flex-shrink-0">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-fun font-bold text-amber-900 text-base">Sabies que...? (La Llei dels Grans Nombres)</h4>
+                        <p class="text-xs sm:text-sm text-amber-800 mt-0.5 leading-relaxed">
+                            Si fas pocs intents (p. ex. 5 o 10), els percentatges poden variar molt. Però si fas <span class="font-bold">100 o 1000 intents</span>, veuràs com la freqüència relativa (%) s'acosta cada cop més a la <span class="font-bold">probabilitat teòrica</span>!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Recent Logs Box -->
+                <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200">
+                    <h3 class="text-md font-bold text-slate-700 mb-3 flex items-center justify-between">
+                        <span><i class="fa-solid fa-list-ol text-purple-500 mr-2"></i> Registre dels darrers intents</span>
+                        <span class="text-xs font-normal text-slate-400">(Màxim 20 registres)</span>
+                    </h3>
+                    <div id="historyList" class="max-h-40 overflow-y-auto space-y-1.5 pr-1 text-xs sm:text-sm text-slate-600 font-mono">
+                        <div class="text-slate-400 italic text-center py-2">Encara no s'ha realitzat cap intent.</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 mt-8 text-center text-xs text-slate-500 font-medium">
+        <div class="max-w-7xl mx-auto px-4">
+            🎓 Recursos Educatius de Matemàtiques • Cicle Superior de Primària • Laboratori Interactiu d'Atzar
+        </div>
+    </footer>
+
+    <script>
+        // --- State Variables ---
+        let currentTool = 'coins'; // 'coins', 'dice', 'bag'
+        let currentQuantity = 1;   // 1, 2, or 3
+        let soundEnabled = true;
+
+        // Bag composition (Total 5 balls)
+        let redBalls = 3;
+        let blueBalls = 2;
+
+        // Cumulative Data Stores
+        let statsData = {
+            coins: {},
+            dice: {},
+            bag: {}
+        };
+
+        let historyLog = [];
+        let chartInstance = null;
+
+        // Audio Effects (Web Audio API Synthesizer)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'flip') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                } else if (type === 'dice') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.12);
+                } else if (type === 'ball') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.2);
+                }
+            } catch(e) {
+                console.log("Audio play error", e);
+            }
+        }
+
+        // Toggle Sound
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const icon = document.getElementById('soundIcon');
+            const text = document.getElementById('soundText');
+            if (soundEnabled) {
+                icon.className = 'fa-solid fa-volume-high';
+                text.innerText = 'Sons actius';
+            } else {
+                icon.className = 'fa-solid fa-volume-xmark text-slate-400';
+                text.innerText = 'Sons muts';
+            }
+        }
+
+        // Initialize App
+        window.onload = function() {
+            initToolData();
+            updateVisualizerDefault();
+            renderTableAndChart();
+        };
+
+        // Initialize tool data structure
+        function initToolData() {
+            // COINS
+            statsData.coins = {
+                1: { 'Cara': 0, 'Creu': 0 },
+                2: { '2 Cares': 0, '1 Cara i 1 Creu': 0, '2 Creus': 0 },
+                3: { '3 Cares': 0, '2 Cares, 1 Creu': 0, '1 Cara, 2 Creus': 0, '3 Creus': 0 }
+            };
+
+            // DICE
+            statsData.dice = {
+                1: { '1':0, '2':0, '3':0, '4':0, '5':0, '6':0 },
+                2: { 'Suma 2':0, 'Suma 3':0, 'Suma 4':0, 'Suma 5':0, 'Suma 6':0, 'Suma 7':0, 'Suma 8':0, 'Suma 9':0, 'Suma 10':0, 'Suma 11':0, 'Suma 12':0 },
+                3: {} // We categorize sum range or totals
+            };
+            // Populate sum 3..18 for 3 dice
+            for(let i=3; i<=18; i++) {
+                statsData.dice[3][`Suma ${i}`] = 0;
+            }
+
+            // BAG
+            statsData.bag = {
+                1: { '🔴 Vermella': 0, '🔵 Blava': 0 },
+                2: { '🔴🔴 2 Vermelles': 0, '🔴🔵 1 Vermella i 1 Blava': 0, '🔵🔵 2 Blaves': 0 },
+                3: { '🔴🔴🔴 3 Vermelles': 0, '🔴🔴🔵 2 Vermelles i 1 Blava': 0, '🔴🔵🔵 1 Vermella i 2 Blaves': 0, '🔵🔵🔵 3 Blaves': 0 }
+            };
+        }
+
+        // Switch Tools (Monedes / Daus / Bossa)
+        function switchTool(tool) {
+            currentTool = tool;
+
+            // Highlight Tab Buttons
+            ['Coins', 'Dice', 'Bag'].forEach(t => {
+                const btn = document.getElementById('tab' + t);
+                if (t.toLowerCase() === tool) {
+                    btn.className = "tool-tab flex flex-col sm:flex-row items-center justify-center p-3 sm:p-4 rounded-2xl border-2 font-fun text-base sm:text-lg transition-all shadow-sm bg-white border-indigo-500 text-indigo-600 shadow-indigo-100";
+                } else {
+                    btn.className = "tool-tab flex flex-col sm:flex-row items-center justify-center p-3 sm:p-4 rounded-2xl border-2 font-fun text-base sm:text-lg transition-all shadow-sm bg-white border-transparent text-slate-600 hover:border-slate-300";
+                }
+            });
+
+            // Toggle custom bag slider
+            const bagCustomizer = document.getElementById('bagCustomizer');
+            if (tool === 'bag') {
+                bagCustomizer.classList.remove('hidden');
+            } else {
+                bagCustomizer.classList.add('hidden');
+            }
+
+            updateStageBadge();
+            updateVisualizerDefault();
+            renderTableAndChart();
+        }
+
+        // Set Quantity (1, 2, or 3)
+        function setQuantity(qty) {
+            currentQuantity = qty;
+
+            [1, 2, 3].forEach(q => {
+                const btn = document.getElementById(`qtyBtn${q}`);
+                if (q === qty) {
+                    btn.className = "qty-btn py-2.5 rounded-xl border-2 font-bold text-sm transition text-center border-indigo-600 bg-indigo-50 text-indigo-700";
+                } else {
+                    btn.className = "qty-btn py-2.5 rounded-xl border-2 font-bold text-sm transition text-center border-slate-200 text-slate-600 hover:border-slate-300";
+                }
+            });
+
+            updateStageBadge();
+            updateVisualizerDefault();
+            renderTableAndChart();
+        }
+
+        function setAttempts(val) {
+            document.getElementById('attemptsInput').value = val;
+        }
+
+        function updateStageBadge() {
+            const badge = document.getElementById('stageBadge');
+            const toolNames = { coins: 'Moneda', dice: 'Dau', bag: 'Bola de la bossa' };
+            const pluralNames = { coins: 'Monedes', dice: 'Daus', bag: 'Boles de la bossa' };
+            const name = currentQuantity === 1 ? toolNames[currentTool] : pluralNames[currentTool];
+            badge.innerText = `${currentQuantity} ${name}`;
+        }
+
+        // Bag composition slider update
+        function updateBagComposition(val) {
+            redBalls = parseInt(val);
+            blueBalls = 5 - redBalls;
+            document.getElementById('redCountLabel').innerText = redBalls;
+            document.getElementById('blueCountLabel').innerText = blueBalls;
+            
+            // Re-render visual defaults and charts since probabilities change
+            updateVisualizerDefault();
+            renderTableAndChart();
+        }
+
+        // Default visual stage setup
+        function updateVisualizerDefault() {
+            const container = document.getElementById('visualizerZone');
+            container.innerHTML = '';
+
+            if (currentTool === 'coins') {
+                for (let i = 0; i < currentQuantity; i++) {
+                    container.innerHTML += `
+                        <div class="coin-container">
+                            <div class="coin" id="coin_${i}">
+                                <div class="coin-face coin-heads"><i class="fa-solid fa-crown"></i></div>
+                                <div class="coin-face coin-tails"><i class="fa-solid fa-star"></i></div>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else if (currentTool === 'dice') {
+                for (let i = 0; i < currentQuantity; i++) {
+                    container.innerHTML += `
+                        <div class="dice text-indigo-700" id="dice_${i}">
+                            <i class="fa-solid fa-dice-one"></i>
+                        </div>
+                    `;
+                }
+            } else if (currentTool === 'bag') {
+                for (let i = 0; i < currentQuantity; i++) {
+                    container.innerHTML += `
+                        <div class="ball bg-slate-700 border-2 border-slate-500 text-2xl" id="ball_${i}">
+                            ❓
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Main Simulation Runner
+        function runSimulation() {
+            const numAttempts = parseInt(document.getElementById('attemptsInput').value) || 1;
+            const isSingle = numAttempts === 1;
+
+            if (isSingle) {
+                // Play animation
+                animateAndSimulateSingle();
+            } else {
+                // Batch simulation
+                simulateBatch(numAttempts);
+                playSound(currentTool === 'coins' ? 'flip' : (currentTool === 'dice' ? 'dice' : 'ball'));
+            }
+        }
+
+        // Single interactive simulation with animations
+        function animateAndSimulateSingle() {
+            const runBtn = document.getElementById('runBtn');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-50');
+
+            playSound(currentTool === 'coins' ? 'flip' : (currentTool === 'dice' ? 'dice' : 'ball'));
+
+            // Generate single outcome
+            const result = generateOutcome(currentTool, currentQuantity);
+
+            // Animate element DOMs
+            if (currentTool === 'coins') {
+                result.outcomes.forEach((val, idx) => {
+                    const el = document.getElementById(`coin_${idx}`);
+                    if (el) {
+                        el.classList.remove('anim-flip');
+                        void el.offsetWidth; // trigger reflow
+                        el.classList.add('anim-flip');
+                        setTimeout(() => {
+                            el.style.transform = val === 'Cara' ? 'rotateY(0deg)' : 'rotateY(180deg)';
+                        }, 400);
+                    }
+                });
+            } else if (currentTool === 'dice') {
+                const diceIcons = ['fa-dice-one', 'fa-dice-two', 'fa-dice-three', 'fa-dice-four', 'fa-dice-five', 'fa-dice-six'];
+                result.outcomes.forEach((val, idx) => {
+                    const el = document.getElementById(`dice_${idx}`);
+                    if (el) {
+                        el.classList.remove('anim-dice');
+                        void el.offsetWidth;
+                        el.classList.add('anim-dice');
+                        setTimeout(() => {
+                            el.innerHTML = `<i class="fa-solid ${diceIcons[val - 1]}"></i>`;
+                        }, 300);
+                    }
+                });
+            } else if (currentTool === 'bag') {
+                result.outcomes.forEach((color, idx) => {
+                    const el = document.getElementById(`ball_${idx}`);
+                    if (el) {
+                        el.classList.remove('anim-ball');
+                        void el.offsetWidth;
+                        el.classList.add('anim-ball');
+                        setTimeout(() => {
+                            if (color === '🔴') {
+                                el.className = "ball bg-red-500 border-2 border-red-300 text-lg font-bold";
+                                el.innerText = "🔴";
+                            } else {
+                                el.className = "ball bg-blue-500 border-2 border-blue-300 text-lg font-bold";
+                                el.innerText = "🔵";
+                            }
+                        }, 250);
+                    }
+                });
+            }
+
+            setTimeout(() => {
+                // Record result
+                recordResult(result.category, result.summary);
+                runBtn.disabled = false;
+                runBtn.classList.remove('opacity-50');
+            }, 600);
+        }
+
+        // Batch simulation loop
+        function simulateBatch(count) {
+            let lastRes = null;
+            for (let i = 0; i < count; i++) {
+                lastRes = generateOutcome(currentTool, currentQuantity);
+                recordResultSilent(lastRes.category);
+            }
+
+            // Update DOM visual for last outcome
+            if (lastRes) {
+                document.getElementById('lastResultText').innerText = `${lastRes.summary} (${lastRes.category})`;
+                addHistoryLog(`Simulació massiva de ${count} intents. ÚLTIM: ${lastRes.summary}`);
+            }
+
+            renderTableAndChart();
+        }
+
+        // Outcome Generator Core Math
+        function generateOutcome(tool, qty) {
+            if (tool === 'coins') {
+                let outcomes = [];
+                let headsCount = 0;
+                for (let i = 0; i < qty; i++) {
+                    const isHead = Math.random() < 0.5;
+                    outcomes.push(isHead ? 'Cara' : 'Creu');
+                    if (isHead) headsCount++;
+                }
+
+                let category = '';
+                if (qty === 1) {
+                    category = outcomes[0];
+                } else if (qty === 2) {
+                    if (headsCount === 2) category = '2 Cares';
+                    else if (headsCount === 1) category = '1 Cara i 1 Creu';
+                    else category = '2 Creus';
+                } else if (qty === 3) {
+                    if (headsCount === 3) category = '3 Cares';
+                    else if (headsCount === 2) category = '2 Cares, 1 Creu';
+                    else if (headsCount === 1) category = '1 Cara, 2 Creus';
+                    else category = '3 Creus';
+                }
+
+                return {
+                    outcomes: outcomes,
+                    summary: outcomes.join(', '),
+                    category: category
+                };
+
+            } else if (tool === 'dice') {
+                let outcomes = [];
+                let sum = 0;
+                for (let i = 0; i < qty; i++) {
+                    const val = Math.floor(Math.random() * 6) + 1;
+                    outcomes.push(val);
+                    sum += val;
+                }
+
+                let category = '';
+                if (qty === 1) {
+                    category = `${outcomes[0]}`;
+                } else {
+                    category = `Suma ${sum}`;
+                }
+
+                return {
+                    outcomes: outcomes,
+                    summary: outcomes.map(d => `🎲 ${d}`).join(' + ') + (qty > 1 ? ` = ${sum}` : ''),
+                    category: category
+                };
+
+            } else if (tool === 'bag') {
+                // Drawing without replacement for the current batch of 'qty' balls
+                let bagPool = [];
+                for (let r = 0; r < redBalls; r++) bagPool.push('🔴');
+                for (let b = 0; b < blueBalls; b++) bagPool.push('🔵');
+
+                let outcomes = [];
+                let redDrawn = 0;
+                let blueDrawn = 0;
+
+                for (let i = 0; i < qty; i++) {
+                    const randIndex = Math.floor(Math.random() * bagPool.length);
+                    const drawn = bagPool.splice(randIndex, 1)[0];
+                    outcomes.push(drawn);
+                    if (drawn === '🔴') redDrawn++;
+                    else blueDrawn++;
+                }
+
+                let category = '';
+                if (qty === 1) {
+                    category = redDrawn === 1 ? '🔴 Vermella' : '🔵 Blava';
+                } else if (qty === 2) {
+                    if (redDrawn === 2) category = '🔴🔴 2 Vermelles';
+                    else if (redDrawn === 1) category = '🔴🔵 1 Vermella i 1 Blava';
+                    else category = '🔵🔵 2 Blaves';
+                } else if (qty === 3) {
+                    if (redDrawn === 3) category = '🔴🔴🔴 3 Vermelles';
+                    else if (redDrawn === 2) category = '🔴🔴🔵 2 Vermelles i 1 Blava';
+                    else if (redDrawn === 1) category = '🔴🔵🔵 1 Vermella i 2 Blaves';
+                    else category = '🔵🔵🔵 3 Blaves';
+                }
+
+                return {
+                    outcomes: outcomes,
+                    summary: outcomes.join(' '),
+                    category: category
+                };
+            }
+        }
+
+        // Record single result & update UI
+        function recordResult(category, summary) {
+            recordResultSilent(category);
+            document.getElementById('lastResultText').innerText = `${summary} → (${category})`;
+            addHistoryLog(`${summary} (${category})`);
+            renderTableAndChart();
+        }
+
+        function recordResultSilent(category) {
+            if (statsData[currentTool][currentQuantity][category] !== undefined) {
+                statsData[currentTool][currentQuantity][category]++;
+            }
+        }
+
+        function addHistoryLog(msg) {
+            const now = new Date().toLocaleTimeString('ca-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            historyLog.unshift(`[${now}] ${msg}`);
+            if (historyLog.length > 20) historyLog.pop();
+
+            const container = document.getElementById('historyList');
+            container.innerHTML = historyLog.map(item => `
+                <div class="py-1 border-b border-slate-100 flex items-center justify-between">
+                    <span>${item}</span>
+                </div>
+            `).join('');
+        }
+
+        // Compute theoretical probabilities
+        function getTheoreticalProbabilities(tool, qty) {
+            let probs = {};
+
+            if (tool === 'coins') {
+                if (qty === 1) {
+                    probs['Cara'] = 0.5;
+                    probs['Creu'] = 0.5;
+                } else if (qty === 2) {
+                    probs['2 Cares'] = 1/4;          // CC
+                    probs['1 Cara i 1 Creu'] = 2/4;  // CCr, CrC
+                    probs['2 Creus'] = 1/4;          // CrCr
+                } else if (qty === 3) {
+                    probs['3 Cares'] = 1/8;
+                    probs['2 Cares, 1 Creu'] = 3/8;
+                    probs['1 Cara, 2 Creus'] = 3/8;
+                    probs['3 Creus'] = 1/8;
+                }
+            } else if (tool === 'dice') {
+                if (qty === 1) {
+                    for(let i=1; i<=6; i++) probs[`${i}`] = 1/6;
+                } else if (qty === 2) {
+                    // Sum of 2 dice
+                    let combinations = {};
+                    for(let i=2; i<=12; i++) combinations[`Suma ${i}`] = 0;
+                    for(let d1=1; d1<=6; d1++) {
+                        for(let d2=1; d2<=6; d2++) {
+                            combinations[`Suma ${d1+d2}`]++;
+                        }
+                    }
+                    for(let key in combinations) probs[key] = combinations[key] / 36;
+                } else if (qty === 3) {
+                    // Sum of 3 dice
+                    let combinations = {};
+                    for(let i=3; i<=18; i++) combinations[`Suma ${i}`] = 0;
+                    for(let d1=1; d1<=6; d1++) {
+                        for(let d2=1; d2<=6; d2++) {
+                            for(let d3=1; d3<=6; d3++) {
+                                combinations[`Suma ${d1+d2+d3}`]++;
+                            }
+                        }
+                    }
+                    for(let key in combinations) probs[key] = combinations[key] / 216;
+                }
+            } else if (tool === 'bag') {
+                // Bag has redBalls (R) and blueBalls (B), total N=5
+                const R = redBalls;
+                const B = blueBalls;
+                const N = 5;
+
+                // Combination Helper nCr
+                function nCr(n, r) {
+                    if (r < 0 || r > n) return 0;
+                    if (r === 0 || r === n) return 1;
+                    if (r === 1) return n;
+                    if (n === 5 && r === 2) return 10;
+                    if (n === 5 && r === 3) return 10;
+                    return 1;
+                }
+
+                const totalDraws = nCr(N, qty);
+
+                if (qty === 1) {
+                    probs['🔴 Vermella'] = R / N;
+                    probs['🔵 Blava'] = B / N;
+                } else if (qty === 2) {
+                    probs['🔴🔴 2 Vermelles'] = nCr(R, 2) / totalDraws;
+                    probs['🔴🔵 1 Vermella i 1 Blava'] = (nCr(R, 1) * nCr(B, 1)) / totalDraws;
+                    probs['🔵🔵 2 Blaves'] = nCr(B, 2) / totalDraws;
+                } else if (qty === 3) {
+                    probs['🔴🔴🔴 3 Vermelles'] = nCr(R, 3) / totalDraws;
+                    probs['🔴🔴🔵 2 Vermelles i 1 Blava'] = (nCr(R, 2) * nCr(B, 1)) / totalDraws;
+                    probs['🔴🔵🔵 1 Vermella i 2 Blaves'] = (nCr(R, 1) * nCr(B, 2)) / totalDraws;
+                    probs['🔵🔵🔵 3 Blaves'] = nCr(B, 3) / totalDraws;
+                }
+            }
+
+            return probs;
+        }
+
+        // Render Frequency Table & Chart.js
+        function renderTableAndChart() {
+            const currentStats = statsData[currentTool][currentQuantity];
+            const theoretical = getTheoreticalProbabilities(currentTool, currentQuantity);
+
+            let totalAttempts = 0;
+            for (let k in currentStats) {
+                totalAttempts += currentStats[k];
+            }
+
+            document.getElementById('totalAttemptsCounter').innerText = totalAttempts;
+
+            const tableBody = document.getElementById('frequencyTableBody');
+            tableBody.innerHTML = '';
+
+            let labels = [];
+            let experimentalPercents = [];
+            let theoreticalPercents = [];
+
+            for (let category in currentStats) {
+                const count = currentStats[category];
+                const relFreq = totalAttempts > 0 ? (count / totalAttempts) * 100 : 0;
+                const theoFreq = (theoretical[category] || 0) * 100;
+
+                labels.push(category);
+                experimentalPercents.push(relFreq.toFixed(1));
+                theoreticalPercents.push(theoFreq.toFixed(1));
+
+                tableBody.innerHTML += `
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="p-3 font-semibold text-slate-800">${category}</td>
+                        <td class="p-3 text-center text-indigo-600 font-bold">${count}</td>
+                        <td class="p-3 text-center">
+                            <span class="inline-block px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 font-bold text-xs">
+                                ${relFreq.toFixed(1)}%
+                            </span>
+                        </td>
+                        <td class="p-3 text-center text-slate-500 font-medium">
+                            ${theoFreq.toFixed(1)}%
+                        </td>
+                    </tr>
+                `;
+            }
+
+            // Render Chart.js
+            const ctx = document.getElementById('resultsChart').getContext('2d');
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Experimental (%)',
+                            data: experimentalPercents,
+                            backgroundColor: 'rgba(99, 102, 241, 0.85)',
+                            borderColor: 'rgb(79, 70, 229)',
+                            borderWidth: 1.5,
+                            borderRadius: 8
+                        },
+                        {
+                            type: 'line',
+                            label: 'Teòric (%)',
+                            data: theoreticalPercents,
+                            borderColor: 'rgb(245, 158, 11)',
+                            backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: 'rgb(245, 158, 11)',
+                            fill: false,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: { family: 'Fredoka', size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) { return value + '%'; }
+                            },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Clear current active table data
+        function clearCurrentData() {
+            for (let k in statsData[currentTool][currentQuantity]) {
+                statsData[currentTool][currentQuantity][k] = 0;
+            }
+            renderTableAndChart();
+        }
+
+        // Reset All Application Data
+        function resetAllData() {
+            initToolData();
+            historyLog = [];
+            document.getElementById('historyList').innerHTML = `<div class="text-slate-400 italic text-center py-2">Encara no s'ha realitzat cap intent.</div>`;
+            document.getElementById('lastResultText').innerText = 'Prem el botó per començar!';
+            updateVisualizerDefault();
+            renderTableAndChart();
+        }
+    </script>
+</body>
+</html>
