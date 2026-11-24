@@ -17,6 +17,9 @@ Aquest repositori allotja el portal web d'accés ràpid a una col·lecció d'ein
 * **🌍 [Càlcul Global (El Quinzet)](https://cromer23cat.github.io/matematiques/calculglobal/index.html)**
   Problemes verbals de càlcul mental interactiu organitzats en 13 sèries progressives (des d'Educació Infantil fins a 6è de Primària).
 
+* **✖️ [Exàmen oral Taules de multiplicar](https://cromer23cat.github.io/matematiques/examenoraltaules/index.html)**
+  App per pràcticar les taules de multiplicar a classe.
+
 * **🎲 [Laboratori de l'Atzar](https://cromer23cat.github.io/matematiques/laboratoriatzar/index.html)**
   Simulador d'experiments aleatoris, probabilitats i gràfiques estadístiques en temps real orientat al Cicle Superior.
 
