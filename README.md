@@ -11,22 +11,22 @@ Aquest repositori allotja el portal web d'accés ràpid a una col·lecció d'ein
 * **✖️ [Taules de Multiplicar](https://cromer23cat.github.io/matematiques/taulesmultiplicar/index.html)**
   Eina interactiva per a la memorització i automatització de les taules de multiplicar de l'1 al 10 mitjançant reptes de velocitat.
 
-* **🧮 [Càlcul Ràpid (El Quinzet)](https://cromer23cat.github.io/calculrapid/index.html)**
+* **🧮 [Càlcul Ràpid (El Quinzet)](https://cromer23cat.github.io/matematiques/calculrapid/index.html)**
   Sèries automatitzades de càlcul mental ràpid dissenyades per millorar l'agilitat aritmètica a l'aula.
 
-* **🌍 [Càlcul Global (El Quinzet)](https://cromer23cat.github.io/calculglobal/index.html)**
+* **🌍 [Càlcul Global (El Quinzet)](https://cromer23cat.github.io/matematiques/calculglobal/index.html)**
   Problemes verbals de càlcul mental interactiu organitzats en 13 sèries progressives (des d'Educació Infantil fins a 6è de Primària).
 
-* **🎲 [Laboratori de l'Atzar](https://cromer23cat.github.io/laboratoriatzar/index.html)**
+* **🎲 [Laboratori de l'Atzar](https://cromer23cat.github.io/matematiques/laboratoriatzar/index.html)**
   Simulador d'experiments aleatoris, probabilitats i gràfiques estadístiques en temps real orientat al Cicle Superior.
 
-* **🤖 [La Màquina de Funcions](https://cromer23cat.github.io/maquinesmatematiques/index.html)**
+* **🤖 [La Màquina de Funcions](https://cromer23cat.github.io/matematiques/maquinesmatematiques/index.html)**
   Activitat de pensament algebraic per descobrir regles matemàtiques ocultes a través de relacions d'Entrada i Sortida.
 
-* **📐 [Menseki Meiro](https://cromer23cat.github.io/Menseki_Meiro/index.html)**
+* **📐 [Menseki Meiro](https://cromer23cat.github.io/matematiques/Menseki_Meiro/index.html)**
   Laberints d'àrees visuals d'origen japonès per desenvolupar el raonament geomètric sense necessitat d'operar amb decimals o fraccions complexes.
 
-* **🚴 [El Tour de Mates](https://cromer23cat.github.io/tour_de_mates/index.html)**
+* **🚴 [El Tour de Mates](https://cromer23cat.github.io/matematiquestour_de_mates/index.html)**
   Directori d'accés ràpid a píndoles de càlcul mental i recursos gamificats vinculats al projecte *El Tour de Mates*.
 
 ### 📖 Llengua Castellana
