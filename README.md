@@ -29,6 +29,9 @@ Aquest repositori allotja el portal web d'accés ràpid a una col·lecció d'ein
 * **📐 [Menseki Meiro](https://cromer23cat.github.io/matematiques/Menseki_Meiro/index.html)**
   Laberints d'àrees visuals d'origen japonès per desenvolupar el raonament geomètric sense necessitat d'operar amb decimals o fraccions complexes.
 
+* **🔺 [Piràmides numèriques](https://cromer23cat.github.io/matematiques/piramidesmatematiques/index.html)**
+  App per practicar el càlcul mental de sumes i restes (naturals i decimals) amb quatre nivells de dificultat, mode contrarellotge i classificació setmanal anònima.
+
 * **🚴 [El Tour de Mates](https://cromer23cat.github.io/matematiques/tour_de_mates/index.html)**
   Directori d'accés ràpid a píndoles de càlcul mental i recursos gamificats vinculats al projecte *El Tour de Mates*.
 
