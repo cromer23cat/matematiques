@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menseki Meiro - Escola Sant Salvador</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;800&family=Patrick+Hand&display=swap');
+        
+        :root {
+            --primary: #4f46e5;
+            --accent: #f59e0b;
+            --bg-school: #f0f4ff;
+        }
+
+        body {
+            font-family: 'Lexend', sans-serif;
+            background-color: var(--bg-school);
+            background-image: radial-gradient(circle at 2px 2px, #d1d5db 1px, transparent 0);
+            background-size: 32px 32px;
+        }
+
+        .handwritten {
+            font-family: 'Patrick Hand', cursive;
+        }
+
+        .school-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+
+        .canvas-area {
+            background: #ffffff;
+            border-radius: 20px;
+            border: 4px solid #e2e8f0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .btn-action {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-action:active { transform: scale(0.95); }
+
+        .diff-opt {
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .diff-opt.active[data-d="1"] { border-color: #22c55e; background-color: #f0fdf4; color: #15803d; }
+        .diff-opt.active[data-d="2"] { border-color: #f59e0b; background-color: #fffbeb; color: #b45309; }
+        .diff-opt.active[data-d="3"] { border-color: #ef4444; background-color: #fef2f2; color: #b91c1c; }
+
+        @keyframes pop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop { animation: pop 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 p-4 md:p-10">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Banner Escola (Únic lloc on apareix el nom de l'escola) -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
+            <div class="text-center md:text-left">
+                <div class="inline-block px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-bold uppercase tracking-widest mb-2">
+                    📍 Albatàrrec
+                </div>
+                <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">
+                    Escola <span class="text-indigo-600">Sant Salvador</span>
+                </h1>
+                <p class="text-slate-500 font-medium italic">Matemàtiques Visuals: Reptes de càlcul d'àrees</p>
+            </div>
+
+            <div class="flex gap-4">
+                <div class="bg-gradient-to-br from-indigo-500 to-purple-600 px-6 py-3 rounded-2xl text-white shadow-lg flex flex-col items-center justify-center">
+                    <span class="text-[10px] font-black uppercase opacity-80 tracking-widest">Ratxa d'encerts</span>
+                    <span id="streak" class="text-3xl font-black">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Tauler de Joc -->
+            <div class="lg:col-span-8 space-y-6">
+                <div class="school-card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <div id="diff-selector" class="flex gap-2">
+                            <button onclick="setDifficulty(1)" id="d1" data-d="1" class="diff-opt active px-4 py-2 rounded-xl text-sm font-bold">Iniciació</button>
+                            <button onclick="setDifficulty(2)" id="d2" data-d="2" class="diff-opt px-4 py-2 rounded-xl text-sm font-bold">Intermig</button>
+                            <button onclick="setDifficulty(3)" id="d3" data-d="3" class="diff-opt px-4 py-2 rounded-xl text-sm font-bold">Expert</button>
+                        </div>
+                        <div class="flex flex-col items-end">
+                            <span id="puzzleModelName" class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider mb-1">MODEL: BÀSIC</span>
+                            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded">DIBUIX A ESCALA</span>
+                        </div>
+                    </div>
+                    
+                    <div class="canvas-area flex justify-center items-center p-4 min-h-[480px]">
+                        <canvas id="meiroCanvas" width="600" height="460"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panell Lateral -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="school-card p-8 flex flex-col h-full border-b-8 border-indigo-500">
+                    <h2 class="text-xl font-bold mb-6 text-slate-800 flex items-center gap-2">
+                        <span class="bg-indigo-100 p-2 rounded-lg text-lg">🎯</span> Solució
+                    </h2>
+                    
+                    <div class="space-y-6 flex-grow">
+                        <div>
+                            <label id="inputLabel" class="block text-xs font-black text-slate-400 uppercase mb-2 tracking-wide">Introdueix el nombre</label>
+                            <div class="relative">
+                                <input type="number" id="userAnswer" 
+                                    class="w-full bg-slate-50 border-3 border-slate-100 rounded-2xl px-6 py-5 text-4xl font-black text-indigo-600 focus:border-indigo-400 outline-none transition-all placeholder:text-slate-200"
+                                    placeholder="?">
+                                <span id="unitIndicator" class="absolute right-4 bottom-4 text-slate-300 font-bold text-sm">cm²</span>
+                            </div>
+                        </div>
+
+                        <button onclick="checkAnswer()" class="btn-action w-full bg-indigo-600 hover:bg-indigo-700 text-white py-5 rounded-2xl font-bold text-xl shadow-xl shadow-indigo-200">
+                            Comprovar
+                        </button>
+
+                        <div id="feedback" class="hidden p-4 rounded-2xl text-center font-bold animate-pop"></div>
+                    </div>
+
+                    <div class="mt-8 pt-8 border-t border-slate-100 flex gap-3">
+                        <button onclick="generatePuzzle()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-4 rounded-2xl font-bold transition-colors flex items-center justify-center gap-2">
+                            <span>🔄</span> Nou repte
+                        </button>
+                        <button onclick="toggleHint()" class="bg-amber-100 hover:bg-amber-200 text-amber-700 w-16 rounded-2xl flex items-center justify-center text-xl shadow-sm">
+                            💡
+                        </button>
+                    </div>
+                </div>
+
+                <div id="hintBox" class="hidden school-card p-6 border-l-8 border-amber-400 animate-pop">
+                    <p class="text-[10px] font-black text-amber-600 uppercase mb-2 tracking-widest italic">Pista d'ajuda</p>
+                    <p id="hintText" class="handwritten text-lg text-slate-700 leading-snug"></p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-8 text-center text-slate-400 text-xs">
+            Basat en els models de PCMAT de l'Escola Sant Salvador (Albatàrrec).
+        </footer>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('meiroCanvas');
+        const ctx = canvas.getContext('2d');
+        const feedback = document.getElementById('feedback');
+        const hintBox = document.getElementById('hintBox');
+        const hintText = document.getElementById('hintText');
+        const userInput = document.getElementById('userAnswer');
+        const streakEl = document.getElementById('streak');
+        const unitIndicator = document.getElementById('unitIndicator');
+        const modelNameEl = document.getElementById('puzzleModelName');
+
+        let currentPuzzle = null;
+        let difficulty = 1;
+        let streak = 0;
+        const SCALE = 22; 
+
+        function setDifficulty(d) {
+            difficulty = d;
+            document.querySelectorAll('.diff-opt').forEach((p, idx) => {
+                p.classList.toggle('active', idx + 1 === d);
+            });
+            generatePuzzle();
+        }
+
+        function generatePuzzle() {
+            feedback.classList.add('hidden');
+            hintBox.classList.add('hidden');
+            userInput.value = '';
+            
+            let type;
+            if(difficulty === 1) {
+                type = [0, 1, 2][Math.floor(Math.random() * 3)];
+            } else if(difficulty === 2) {
+                type = [2, 3, 4, 7][Math.floor(Math.random() * 4)];
+            } else {
+                type = [3, 5, 6, 7][Math.floor(Math.random() * 4)];
+            }
+            
+            switch(type) {
+                case 0: createSimplePuzzle(); break;
+                case 1: createAdjacentPuzzle(); break;
+                case 2: createTriplePuzzle(); break;
+                case 3: createGridPuzzle(); break;
+                case 4: createLPuzzle(); break;
+                case 5: createStepPuzzle(); break;
+                case 6: createQuadPuzzle(); break;
+                case 7: createBridgePuzzle(); break;
+            }
+            
+            unitIndicator.textContent = currentPuzzle.isArea ? 'cm²' : 'cm';
+            drawPuzzle();
+        }
+
+        function createSimplePuzzle() {
+            const h = 4 + Math.floor(Math.random() * 5);
+            const w = 5 + Math.floor(Math.random() * 4);
+            modelNameEl.textContent = "MODEL: RECTANGLE BÀSIC";
+            currentPuzzle = { type: 'simple', h, w, a: h*w, isArea: false, solution: w, hint: `Recorda: Àrea = Base × Altura. Si saps l'àrea i l'altura, divideix!` };
+        }
+
+        function createAdjacentPuzzle() {
+            const h = 5, w1 = 4, w2 = 6;
+            modelNameEl.textContent = "MODEL: ADJACENT";
+            currentPuzzle = { type: 'adj', h, w1, w2, a1: h*w1, a2: h*w2, isArea: true, solution: h*w2, hint: `Ambdós rectangles tenen la mateixa altura. Troba-la primer.` };
+        }
+
+        function createTriplePuzzle() {
+            const h = 4 + Math.floor(Math.random() * 3);
+            const w1 = 3, w2 = 5, w3 = 6;
+            modelNameEl.textContent = "MODEL: TREN DE TRES";
+            currentPuzzle = { type: 'triple', h, w1, w2, w3, a1: h*w1, a2: h*w2, a3: h*w3, isArea: true, solution: h*w3, hint: `Aquests tres rectangles comparteixen l'altura lateral.` };
+        }
+
+        function createGridPuzzle() {
+            const h1 = 3, h2 = 4, w1 = 4, w2 = 7;
+            modelNameEl.textContent = "MODEL: GRAELLA 2X2";
+            currentPuzzle = { type: 'grid', h1, h2, w1, w2, a1: h1*w1, a2: h1*w2, a3: h2*w1, a4: h2*w2, isArea: true, solution: h2*w2, hint: `Busca les relacions de proporcionalitat entre les columnes o les files.` };
+        }
+
+        function createLPuzzle() {
+            const h1 = 8, w1 = 4, h2 = 3, w2 = 5;
+            modelNameEl.textContent = "MODEL: FORMA DE L";
+            currentPuzzle = { type: 'L', h1, w1, h2, w2, a1: h1*w1, a2: h2*w2, isArea: false, solution: h1-h2, hint: `La X és la diferència entre l'altura total i l'altura del rectangle de la dreta.` };
+        }
+
+        function createStepPuzzle() {
+            const h1 = 7, w1 = 4, h2 = 5, w2 = 6;
+            modelNameEl.textContent = "MODEL: ESCALA";
+            currentPuzzle = { type: 'step', h1, w1, h2, w2, a1: h1*w1, a2: h2*w2, a3: (h1-h2)*w1, isArea: false, solution: h1-h2, hint: `Calcula l'altura de cada peça per trobar la mida de X.` };
+        }
+
+        function createQuadPuzzle() {
+            const h = 5, w1 = 3, w2 = 4, w3 = 2, w4 = 6;
+            modelNameEl.textContent = "MODEL: TREN DE QUATRE";
+            currentPuzzle = { type: 'quad', h, w1, w2, w3, w4, a1: h*w1, a2: h*w2, a3: h*w3, a4: h*w4, isArea: false, solution: w1+w2+w3+w4, hint: `X és la suma de totes les bases dels rectangles.` };
+        }
+
+        function createBridgePuzzle() {
+            const h1 = 6, h2 = 6, w1 = 4, w2 = 5, wBridge = 3;
+            modelNameEl.textContent = "MODEL: EL PONT";
+            currentPuzzle = { type: 'bridge', h1, w1, w2, wb: wBridge, a1: h1*w1, a2: h2*w2, isArea: true, solution: h1*wBridge, hint: `El rectangle groc central té la mateixa altura que els altres dos.` };
+        }
+
+        function drawPuzzle() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.lineWidth = 3;
+            ctx.lineJoin = 'round';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+
+            if (currentPuzzle.type === 'simple') {
+                const w = currentPuzzle.w * SCALE, h = currentPuzzle.h * SCALE;
+                drawBox(cx - w/2, cy - h/2, w, h, currentPuzzle.a, currentPuzzle.h, 'X');
+            }
+            else if (currentPuzzle.type === 'adj') {
+                const w1 = currentPuzzle.w1 * SCALE, w2 = currentPuzzle.w2 * SCALE, h = currentPuzzle.h * SCALE;
+                const sx = cx - (w1+w2)/2, sy = cy - h/2;
+                drawBox(sx, sy, w1, h, currentPuzzle.a1, null, currentPuzzle.w1);
+                drawBox(sx + w1, sy, w2, h, '?', null, currentPuzzle.w2, '#f0f7ff');
+                ctx.fillStyle = '#64748b'; ctx.font = '14px Lexend'; ctx.fillText(`${currentPuzzle.h} cm`, sx - 30, sy + h/2);
+            }
+            else if (currentPuzzle.type === 'triple') {
+                const w1 = currentPuzzle.w1 * SCALE, w2 = currentPuzzle.w2 * SCALE, w3 = currentPuzzle.w3 * SCALE;
+                const h = currentPuzzle.h * SCALE, tw = w1+w2+w3;
+                let sx = cx - tw/2, sy = cy - h/2;
+                drawBox(sx, sy, w1, h, currentPuzzle.a1, null, w1/SCALE);
+                drawBox(sx + w1, sy, w2, h, currentPuzzle.a2, null, w2/SCALE);
+                drawBox(sx + w1 + w2, sy, w3, h, '?', null, w3/SCALE, '#f0f7ff');
+            }
+            else if (currentPuzzle.type === 'grid') {
+                const w1 = currentPuzzle.w1 * SCALE, w2 = currentPuzzle.w2 * SCALE;
+                const h1 = currentPuzzle.h1 * SCALE, h2 = currentPuzzle.h2 * SCALE;
+                const sx = cx - (w1+w2)/2, sy = cy - (h1+h2)/2;
+                drawBox(sx, sy, w1, h1, currentPuzzle.a1);
+                drawBox(sx + w1, sy, w2, h1, currentPuzzle.a2);
+                drawBox(sx, sy + h1, w1, h2, currentPuzzle.a3);
+                drawBox(sx + w1, sy + h1, w2, h2, '?', null, null, '#f0f7ff');
+            }
+            else if (currentPuzzle.type === 'L') {
+                const w1 = currentPuzzle.w1 * SCALE, h1 = currentPuzzle.h1 * SCALE;
+                const w2 = currentPuzzle.w2 * SCALE, h2 = currentPuzzle.h2 * SCALE;
+                const sx = cx - w2/2, sy = cy - h1/2;
+                drawBox(sx, sy, w1, h1, currentPuzzle.a1, h1/SCALE, w1/SCALE);
+                drawBox(sx + w1, sy + (h1-h2), w2-w1, h2, currentPuzzle.a2, null, (w2-w1)/SCALE, '#f0fdf4');
+                ctx.fillStyle = '#4f46e5'; ctx.font = 'bold 22px Patrick Hand'; ctx.fillText('X', sx + w1 + 15, sy + (h1-h2)/2);
+            }
+            else if (currentPuzzle.type === 'step') {
+                const w = currentPuzzle.w1 * SCALE, h1 = currentPuzzle.h1 * SCALE, h2 = currentPuzzle.h2 * SCALE;
+                const sx = cx - w/2, sy = cy - h1/2;
+                drawBox(sx, sy, w, h1, currentPuzzle.a1, null, w/SCALE);
+                drawBox(sx + w, sy + (h1-h2), w*1.5, h2, currentPuzzle.a2, null, (w*1.5)/SCALE, '#fef2f2');
+                ctx.fillStyle = '#4f46e5'; ctx.font = 'bold 22px Patrick Hand'; ctx.fillText('X', sx - 20, sy + (h1-h2)/2);
+                ctx.strokeStyle = '#4f46e5'; ctx.beginPath(); ctx.moveTo(sx-5, sy); ctx.lineTo(sx-5, sy+h1-h2); ctx.stroke();
+            }
+            else if (currentPuzzle.type === 'quad') {
+                const widths = [currentPuzzle.w1, currentPuzzle.w2, currentPuzzle.w3, currentPuzzle.w4];
+                const h = currentPuzzle.h * SCALE, tw = widths.reduce((a, b) => a + b, 0) * SCALE;
+                let sx = cx - tw/2, sy = cy - h/2;
+                let curX = sx;
+                widths.forEach((w, i) => {
+                    const aw = w * SCALE;
+                    drawBox(curX, sy, aw, h, currentPuzzle[`a${i+1}`]);
+                    curX += aw;
+                });
+                ctx.fillStyle = '#4f46e5'; ctx.font = 'bold 24px Patrick Hand'; ctx.fillText('X', cx, sy + h + 40);
+                ctx.strokeStyle = '#4f46e5'; ctx.beginPath(); ctx.moveTo(sx, sy+h+25); ctx.lineTo(sx+tw, sy+h+25); ctx.stroke();
+            }
+            else if (currentPuzzle.type === 'bridge') {
+                const w1 = currentPuzzle.w1 * SCALE, w2 = currentPuzzle.w2 * SCALE, wb = currentPuzzle.wb * SCALE;
+                const h = currentPuzzle.h1 * SCALE, tw = w1 + w2 + wb;
+                let sx = cx - tw/2, sy = cy - h/2;
+                drawBox(sx, sy, w1, h, currentPuzzle.a1, h/SCALE);
+                drawBox(sx + w1, sy, wb, h, '?', null, wb/SCALE, '#fefce8');
+                drawBox(sx + w1 + wb, sy, w2, h, currentPuzzle.a2);
+            }
+        }
+
+        function drawBox(x, y, w, h, area, sideL, botL, fill = '#fff') {
+            ctx.fillStyle = fill; ctx.fillRect(x, y, w, h);
+            ctx.strokeStyle = '#1e293b'; ctx.strokeRect(x, y, w, h);
+            
+            ctx.font = area === '?' ? 'bold 32px Lexend' : 'bold 24px Patrick Hand';
+            ctx.fillStyle = area === '?' ? '#4f46e5' : '#1e293b';
+            ctx.fillText(area + (isNaN(area) ? '' : ' cm²'), x + w/2, y + h/2);
+
+            ctx.font = '14px Lexend'; ctx.fillStyle = '#64748b';
+            if (sideL) ctx.fillText(sideL + ' cm', x - 35, y + h/2);
+            if (botL) {
+                if(botL === 'X') {
+                    ctx.fillStyle = '#4f46e5'; ctx.font = 'bold 24px Patrick Hand';
+                    ctx.fillText('X', x + w/2, y + h + 25);
+                } else {
+                    ctx.fillText(botL + ' cm', x + w/2, y + h + 25);
+                }
+            }
+        }
+
+        function checkAnswer() {
+            const val = parseInt(userInput.value);
+            feedback.classList.remove('hidden', 'bg-green-100', 'text-green-700', 'bg-red-100', 'text-red-700');
+            if (val === currentPuzzle.solution) {
+                feedback.textContent = "🌟 Resposta correcta! Molt bona lògica.";
+                feedback.classList.add('bg-green-100', 'text-green-700');
+                streak++;
+            } else {
+                feedback.textContent = "Encara no és correcte. Revisa els passos!";
+                feedback.classList.add('bg-red-100', 'text-red-700');
+                streak = 0;
+            }
+            streakEl.textContent = streak;
+        }
+
+        function toggleHint() {
+            hintText.textContent = currentPuzzle.hint;
+            hintBox.classList.toggle('hidden');
+        }
+
+        window.onload = () => setDifficulty(1);
+    </script>
+</body>
+</html>
